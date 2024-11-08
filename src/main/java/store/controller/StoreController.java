@@ -4,6 +4,7 @@ import java.util.List;
 import store.input.ProductFileReader;
 import store.input.PromotionFileReader;
 import store.model.ConvenienceStore;
+import store.model.OrderProduct;
 import store.model.Product;
 import store.model.Promotion;
 
@@ -17,6 +18,8 @@ public class StoreController {
         List<Product> products = productFileReader.getProducts(promotions);
 
         ConvenienceStore convenienceStore = new ConvenienceStore(products);
+
+        convenienceStore.order(new OrderProduct("콜라", 14));
     }
 
 }
