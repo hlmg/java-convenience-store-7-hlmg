@@ -7,7 +7,7 @@
 - [x] 상품 목록 불러오는 기능
     - `src/main/resources/products.md` 파일 이용하기
     - 내용의 형식을 유지한다면 값은 수정해도 된다.
-- [ ] 행사 목록 불러오는 기능
+- [x] 프로모션 목록 불러오는 기능
     - `src/main/resources/promotions.md`
     - 내용의 형식을 유지한다면 값은 수정해도 된다.
 
