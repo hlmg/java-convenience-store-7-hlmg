@@ -1,10 +1,11 @@
 package store.controller;
 
 import java.util.List;
-import store.model.Product;
-import store.model.Promotion;
 import store.input.ProductFileReader;
 import store.input.PromotionFileReader;
+import store.model.ConvenienceStore;
+import store.model.Product;
+import store.model.Promotion;
 
 public class StoreController {
 
@@ -14,6 +15,8 @@ public class StoreController {
     public void run() {
         List<Promotion> promotions = promotionFileReader.getPromotions();
         List<Product> products = productFileReader.getProducts(promotions);
+
+        ConvenienceStore convenienceStore = new ConvenienceStore(products);
     }
 
 }
