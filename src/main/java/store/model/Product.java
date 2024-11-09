@@ -14,4 +14,12 @@ public class Product {
         this.promotion = promotion;
     }
 
+    public boolean nameEquals(String name) {
+        return this.name.equals(name);
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
 }
