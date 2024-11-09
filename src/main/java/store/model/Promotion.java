@@ -18,8 +18,4 @@ public class Promotion {
         this.endDate = endDate;
     }
 
-    public boolean isSameName(String name) {
-        return this.name.equals(name);
-    }
-
 }

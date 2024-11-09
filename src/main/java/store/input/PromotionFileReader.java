@@ -13,18 +13,11 @@ public class PromotionFileReader {
 
     private static final String PATH = "src/main/resources/promotions.md";
     private static final String DELIMITER = ",";
-    private static final int INDEX_LINE = 1;
-    private static final int NAME = 0;
-    private static final int BUY = 1;
-    private static final int GET = 2;
-    private static final int START_DATE = 3;
-    private static final int END_DATE = 4;
-
 
     public List<Promotion> getPromotions() {
         Path path = Path.of(PATH);
         try (Stream<String> lines = Files.lines(path)) {
-            return lines.skip(INDEX_LINE)
+            return lines.skip(1)
                     .map(this::toStringList)
                     .map(this::toPromotion)
                     .toList();
@@ -40,11 +33,11 @@ public class PromotionFileReader {
 
     private Promotion toPromotion(List<String> strings) {
         return new Promotion(
-                strings.get(NAME),
-                toInt(strings.get(BUY)),
-                toInt(strings.get(GET)),
-                toLocalDate(strings.get(START_DATE)),
-                toLocalDate(strings.get(END_DATE))
+                strings.get(0),
+                toInt(strings.get(1)),
+                toInt(strings.get(2)),
+                toLocalDate(strings.get(3)),
+                toLocalDate(strings.get(4))
         );
     }
 

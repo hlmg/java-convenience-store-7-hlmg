@@ -8,12 +8,12 @@ import store.input.PromotionFileReader;
 
 public class StoreController {
 
-    private final PromotionFileReader promotionFileReader = new PromotionFileReader();
     private final ProductFileReader productFileReader = new ProductFileReader();
+    private final PromotionFileReader promotionFileReader = new PromotionFileReader();
 
     public void run() {
+        List<Product> products = productFileReader.getProducts();
         List<Promotion> promotions = promotionFileReader.getPromotions();
-        List<Product> products = productFileReader.getProducts(promotions);
     }
 
 }
