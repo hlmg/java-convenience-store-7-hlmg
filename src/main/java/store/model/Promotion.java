@@ -18,4 +18,12 @@ public class Promotion {
         this.endDate = endDate;
     }
 
+    public boolean nameEquals(String name) {
+        return this.name.equals(name);
+    }
+
+    public boolean isActiveOn(LocalDate date) {
+        return !(date.isBefore(startDate) || date.isAfter(endDate));
+    }
+
 }

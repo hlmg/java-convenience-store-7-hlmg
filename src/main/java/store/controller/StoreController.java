@@ -1,5 +1,7 @@
 package store.controller;
 
+import camp.nextstep.edu.missionutils.DateTimes;
+import java.time.LocalDate;
 import java.util.List;
 import store.model.ConvenienceStore;
 import store.model.OrderProduct;
@@ -20,8 +22,9 @@ public class StoreController {
                 new OrderProduct("콜라", 3),
                 new OrderProduct("에너지바", 5)
         );
+        LocalDate orderDate = DateTimes.now().toLocalDate();
         for (OrderProduct orderProduct : orderProducts) {
-            purchase(orderProduct);
+            purchase(orderProduct, orderDate);
         }
     }
 
@@ -31,8 +34,8 @@ public class StoreController {
         convenienceStore = new ConvenienceStore(products, promotions);
     }
 
-    private void purchase(OrderProduct orderProduct) {
-        convenienceStore.buy(orderProduct);
+    private void purchase(OrderProduct orderProduct, LocalDate orderDate) {
+        convenienceStore.buy(orderProduct, orderDate);
     }
 
 }

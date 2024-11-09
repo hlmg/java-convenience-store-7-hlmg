@@ -1,6 +1,8 @@
 package store.model;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public class ConvenienceStore {
 
@@ -12,11 +14,21 @@ public class ConvenienceStore {
         this.promotions = promotions;
     }
 
-    public boolean buy(OrderProduct orderProduct) {
-        List<Product> findProducts = findProductByName(orderProduct.name());
+    public BuyResult buy(OrderProduct orderProduct, LocalDate orderDate) {
+        List<Product> findProducts = findProductsByName(orderProduct.name());
         checkProductExist(findProducts);
         checkEnoughStock(findProducts, orderProduct.quantity());
-        return true;
+        Optional<Promotion> activePromotion = getActivePromotion(findProducts, orderDate);
+        if (activePromotion.isPresent()) {
+            return processPromotionOrder(orderProduct, activePromotion.get());
+        }
+        return processRegularOrder(orderProduct);
+    }
+
+    private Optional<Promotion> findPromotionByName(String promotionName) {
+        return promotions.stream()
+                .filter(promotion -> promotion.nameEquals(promotionName))
+                .findAny();
     }
 
     private void checkProductExist(List<Product> products) {
@@ -25,7 +37,7 @@ public class ConvenienceStore {
         }
     }
 
-    private List<Product> findProductByName(String name) {
+    private List<Product> findProductsByName(String name) {
         return products.stream()
                 .filter(product -> product.nameEquals(name))
                 .toList();
@@ -41,6 +53,25 @@ public class ConvenienceStore {
         return products.stream()
                 .mapToInt(Product::getQuantity)
                 .sum();
+    }
+
+    private Optional<Promotion> getActivePromotion(List<Product> products, LocalDate orderDate) {
+        return products.stream()
+                .map(Product::getPromotion)
+                .map(this::findPromotionByName)
+                .flatMap(Optional::stream)
+                .filter(promotion -> promotion.isActiveOn(orderDate))
+                .findAny();
+    }
+
+    private BuyResult processPromotionOrder(OrderProduct orderProduct, Promotion promotion) {
+        // 프로모션 구매 진행
+        return null;
+    }
+
+    private BuyResult processRegularOrder(OrderProduct orderProduct) {
+        // 일반 구매 진행
+        return null;
     }
 
 }
