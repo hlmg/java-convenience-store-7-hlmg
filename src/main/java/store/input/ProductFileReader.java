@@ -30,12 +30,12 @@ public class ProductFileReader {
                 .toList();
     }
 
-    private Product toProduct(List<String> productInfo) {
+    private Product toProduct(List<String> product) {
         return new Product(
-                productInfo.get(0),
-                toInt(productInfo.get(1)),
-                toInt(productInfo.get(2)),
-                productInfo.get(3)
+                product.get(0),
+                toInt(product.get(1)),
+                toInt(product.get(2)),
+                product.get(3)
         );
     }
 

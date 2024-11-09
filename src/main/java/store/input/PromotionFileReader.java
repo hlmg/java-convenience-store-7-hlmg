@@ -31,13 +31,13 @@ public class PromotionFileReader {
                 .toList();
     }
 
-    private Promotion toPromotion(List<String> strings) {
+    private Promotion toPromotion(List<String> promotion) {
         return new Promotion(
-                strings.get(0),
-                toInt(strings.get(1)),
-                toInt(strings.get(2)),
-                toLocalDate(strings.get(3)),
-                toLocalDate(strings.get(4))
+                promotion.get(0),
+                toInt(promotion.get(1)),
+                toInt(promotion.get(2)),
+                toLocalDate(promotion.get(3)),
+                toLocalDate(promotion.get(4))
         );
     }
 
