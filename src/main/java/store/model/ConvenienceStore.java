@@ -4,14 +4,10 @@ import java.util.List;
 
 public class ConvenienceStore {
 
-    private final ProductInventory productInventory;
+    private final ProductInventory productInventory = new ProductInventory();
 
     public ConvenienceStore(List<Product> products) {
-        productInventory = new ProductInventory(products);
-    }
-
-    public void order(OrderProduct orderProduct) {
-        List<Product> products = productInventory.findByName(orderProduct.getName());
+        productInventory.saveAll(products);
     }
 
 }
