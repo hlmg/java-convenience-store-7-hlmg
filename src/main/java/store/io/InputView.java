@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import store.model.OrderProduct;
+import store.model.UserInputCommand;
 
 public class InputView {
 
@@ -18,6 +19,13 @@ public class InputView {
         return Arrays.stream(splitOrderProducts)
                 .map(this::toOrderProduct)
                 .toList();
+    }
+
+    public UserInputCommand askAddBonus(String productName) {
+        String message = String.format("현재 %s은(는) 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)", productName);
+        System.out.println(message);
+        String userInput = Console.readLine();
+        return UserInputCommand.from(userInput);
     }
 
     private OrderProduct toOrderProduct(String orderProduct) {

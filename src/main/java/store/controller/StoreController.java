@@ -13,6 +13,7 @@ import store.model.Product;
 import store.model.Promotion;
 import store.input.ProductFileReader;
 import store.input.PromotionFileReader;
+import store.model.UserInputCommand;
 
 public class StoreController {
 
@@ -46,7 +47,8 @@ public class StoreController {
             return buyResult;
         }
         if (buyResult.buyState() == BuyState.BONUS_ADDABLE) {
-            return null; // 보너스 추가 여부 묻기
+            UserInputCommand bonusAddDecision = inputView.askAddBonus(buyResult.productName());
+            return buyResult.applyBonusDecision(bonusAddDecision);
         }
         if (buyResult.buyState() == BuyState.PARTIALLY_PROMOTED) {
             return null; // 정가 결제 여부 묻기

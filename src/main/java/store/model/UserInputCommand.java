@@ -1,5 +1,7 @@
 package store.model;
 
+import java.util.Arrays;
+
 public enum UserInputCommand {
 
     YES("Y"),
@@ -10,6 +12,13 @@ public enum UserInputCommand {
 
     UserInputCommand(String symbol) {
         this.symbol = symbol;
+    }
+
+    public static UserInputCommand from(String symbol) {
+        return Arrays.stream(UserInputCommand.values())
+                .filter(command -> command.symbol.equals(symbol))
+                .findAny()
+                .orElseThrow(() -> new IllegalArgumentException("잘못된 입력입니다."));
     }
 
 }
