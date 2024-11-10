@@ -65,12 +65,12 @@ class ConvenienceStoreTest {
             BuyResult buyResult = convenienceStore.buy(orderProduct, orderDate);
 
             // then
-            assertThat(buyResult.getBuyType()).isSameAs(BuyType.PROMOTION);
-            assertThat(buyResult.getBuyState()).isSameAs(BuyState.PARTIALLY_PROMOTED);
-            assertThat(buyResult.getPromotionPriceQuantity()).isEqualTo(4);
-            assertThat(buyResult.getBonusQuantity()).isEqualTo(2);
-            assertThat(buyResult.getPendingQuantity()).isEqualTo(2);
-            assertThat(buyResult.getRegularPriceQuantity()).isEqualTo(0);
+            assertThat(buyResult.buyType()).isSameAs(BuyType.PROMOTION);
+            assertThat(buyResult.buyState()).isSameAs(BuyState.PARTIALLY_PROMOTED);
+            assertThat(buyResult.promotionPriceQuantity()).isEqualTo(4);
+            assertThat(buyResult.bonusQuantity()).isEqualTo(2);
+            assertThat(buyResult.pendingQuantity()).isEqualTo(2);
+            assertThat(buyResult.regularPriceQuantity()).isEqualTo(0);
         }
 
         @Test
@@ -92,12 +92,12 @@ class ConvenienceStoreTest {
             BuyResult buyResult = convenienceStore.buy(orderProduct, orderDate);
 
             // then
-            assertThat(buyResult.getBuyType()).isSameAs(BuyType.PROMOTION);
-            assertThat(buyResult.getBuyState()).isSameAs(BuyState.COMPLETE);
-            assertThat(buyResult.getPromotionPriceQuantity()).isEqualTo(4);
-            assertThat(buyResult.getBonusQuantity()).isEqualTo(2);
-            assertThat(buyResult.getPendingQuantity()).isEqualTo(0);
-            assertThat(buyResult.getRegularPriceQuantity()).isEqualTo(0);
+            assertThat(buyResult.buyType()).isSameAs(BuyType.PROMOTION);
+            assertThat(buyResult.buyState()).isSameAs(BuyState.COMPLETE);
+            assertThat(buyResult.promotionPriceQuantity()).isEqualTo(4);
+            assertThat(buyResult.bonusQuantity()).isEqualTo(2);
+            assertThat(buyResult.pendingQuantity()).isEqualTo(0);
+            assertThat(buyResult.regularPriceQuantity()).isEqualTo(0);
         }
 
     }
@@ -125,12 +125,12 @@ class ConvenienceStoreTest {
             BuyResult buyResult = convenienceStore.buy(orderProduct, orderDate);
 
             // then
-            assertThat(buyResult.getBuyType()).isSameAs(BuyType.PROMOTION);
-            assertThat(buyResult.getBuyState()).isSameAs(BuyState.PARTIALLY_PROMOTED);
-            assertThat(buyResult.getPromotionPriceQuantity()).isEqualTo(4);
-            assertThat(buyResult.getBonusQuantity()).isEqualTo(2);
-            assertThat(buyResult.getPendingQuantity()).isEqualTo(1);
-            assertThat(buyResult.getRegularPriceQuantity()).isEqualTo(0);
+            assertThat(buyResult.buyType()).isSameAs(BuyType.PROMOTION);
+            assertThat(buyResult.buyState()).isSameAs(BuyState.PARTIALLY_PROMOTED);
+            assertThat(buyResult.promotionPriceQuantity()).isEqualTo(4);
+            assertThat(buyResult.bonusQuantity()).isEqualTo(2);
+            assertThat(buyResult.pendingQuantity()).isEqualTo(1);
+            assertThat(buyResult.regularPriceQuantity()).isEqualTo(0);
         }
 
         @Test
@@ -152,12 +152,12 @@ class ConvenienceStoreTest {
             BuyResult buyResult = convenienceStore.buy(orderProduct, orderDate);
 
             // then
-            assertThat(buyResult.getBuyType()).isSameAs(BuyType.PROMOTION);
-            assertThat(buyResult.getBuyState()).isSameAs(BuyState.BONUS_ADDABLE);
-            assertThat(buyResult.getPromotionPriceQuantity()).isEqualTo(4);
-            assertThat(buyResult.getBonusQuantity()).isEqualTo(2);
-            assertThat(buyResult.getPendingQuantity()).isEqualTo(2);
-            assertThat(buyResult.getRegularPriceQuantity()).isEqualTo(0);
+            assertThat(buyResult.buyType()).isSameAs(BuyType.PROMOTION);
+            assertThat(buyResult.buyState()).isSameAs(BuyState.BONUS_ADDABLE);
+            assertThat(buyResult.promotionPriceQuantity()).isEqualTo(4);
+            assertThat(buyResult.bonusQuantity()).isEqualTo(2);
+            assertThat(buyResult.pendingQuantity()).isEqualTo(2);
+            assertThat(buyResult.regularPriceQuantity()).isEqualTo(0);
         }
 
         @Test
@@ -179,12 +179,12 @@ class ConvenienceStoreTest {
             BuyResult buyResult = convenienceStore.buy(orderProduct, orderDate);
 
             // then
-            assertThat(buyResult.getBuyType()).isSameAs(BuyType.PROMOTION);
-            assertThat(buyResult.getBuyState()).isSameAs(BuyState.COMPLETE);
-            assertThat(buyResult.getPromotionPriceQuantity()).isEqualTo(6);
-            assertThat(buyResult.getBonusQuantity()).isEqualTo(3);
-            assertThat(buyResult.getPendingQuantity()).isEqualTo(0);
-            assertThat(buyResult.getRegularPriceQuantity()).isEqualTo(0);
+            assertThat(buyResult.buyType()).isSameAs(BuyType.PROMOTION);
+            assertThat(buyResult.buyState()).isSameAs(BuyState.COMPLETE);
+            assertThat(buyResult.promotionPriceQuantity()).isEqualTo(6);
+            assertThat(buyResult.bonusQuantity()).isEqualTo(3);
+            assertThat(buyResult.pendingQuantity()).isEqualTo(0);
+            assertThat(buyResult.regularPriceQuantity()).isEqualTo(0);
         }
 
     }
@@ -207,12 +207,12 @@ class ConvenienceStoreTest {
         BuyResult buyResult = convenienceStore.buy(orderProduct, orderDate);
 
         // then
-        assertThat(buyResult.getBuyType()).isSameAs(BuyType.REGULAR);
-        assertThat(buyResult.getBuyState()).isSameAs(BuyState.COMPLETE);
-        assertThat(buyResult.getPromotionPriceQuantity()).isEqualTo(0);
-        assertThat(buyResult.getBonusQuantity()).isEqualTo(0);
-        assertThat(buyResult.getPendingQuantity()).isEqualTo(0);
-        assertThat(buyResult.getRegularPriceQuantity()).isEqualTo(9);
+        assertThat(buyResult.buyType()).isSameAs(BuyType.REGULAR);
+        assertThat(buyResult.buyState()).isSameAs(BuyState.COMPLETE);
+        assertThat(buyResult.promotionPriceQuantity()).isEqualTo(0);
+        assertThat(buyResult.bonusQuantity()).isEqualTo(0);
+        assertThat(buyResult.pendingQuantity()).isEqualTo(0);
+        assertThat(buyResult.regularPriceQuantity()).isEqualTo(9);
     }
 
     @Test
@@ -234,12 +234,12 @@ class ConvenienceStoreTest {
         BuyResult buyResult = convenienceStore.buy(orderProduct, orderDate);
 
         // then
-        assertThat(buyResult.getBuyType()).isSameAs(BuyType.REGULAR);
-        assertThat(buyResult.getBuyState()).isSameAs(BuyState.COMPLETE);
-        assertThat(buyResult.getPromotionPriceQuantity()).isEqualTo(0);
-        assertThat(buyResult.getBonusQuantity()).isEqualTo(0);
-        assertThat(buyResult.getPendingQuantity()).isEqualTo(0);
-        assertThat(buyResult.getRegularPriceQuantity()).isEqualTo(9);
+        assertThat(buyResult.buyType()).isSameAs(BuyType.REGULAR);
+        assertThat(buyResult.buyState()).isSameAs(BuyState.COMPLETE);
+        assertThat(buyResult.promotionPriceQuantity()).isEqualTo(0);
+        assertThat(buyResult.bonusQuantity()).isEqualTo(0);
+        assertThat(buyResult.pendingQuantity()).isEqualTo(0);
+        assertThat(buyResult.regularPriceQuantity()).isEqualTo(9);
     }
 
 }

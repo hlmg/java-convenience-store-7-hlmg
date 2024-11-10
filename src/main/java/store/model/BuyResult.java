@@ -1,26 +1,16 @@
 package store.model;
 
-public class BuyResult {
+public record BuyResult(
+        BuyType buyType,
+        BuyState buyState,
+        int promotionPriceQuantity,
+        int bonusQuantity,
+        int pendingQuantity,
+        int regularPriceQuantity
+) {
 
-    private final BuyType buyType;
-    private final BuyState buyState;
-    private final int promotionPriceQuantity;
-    private final int bonusQuantity;
-    private final int pendingQuantity;
-    private final int regularPriceQuantity;
-
-    public BuyResult(BuyType buyType, BuyState buyState, int promotionPriceQuantity, int bonusQuantity,
-                     int pendingQuantity,
-                     int regularPriceQuantity) {
-        this.buyType = buyType;
-        this.buyState = buyState;
-        this.promotionPriceQuantity = promotionPriceQuantity;
-        this.bonusQuantity = bonusQuantity;
-        this.pendingQuantity = pendingQuantity;
-        this.regularPriceQuantity = regularPriceQuantity;
-    }
-
-    public static BuyResult createPromotionCompleteResult(int promotionPriceQuantity, int bonusQuantity, int regularPriceQuantity) {
+    public static BuyResult createPromotionCompleteResult(int promotionPriceQuantity, int bonusQuantity,
+                                                          int regularPriceQuantity) {
         return new BuyResult(BuyType.PROMOTION, BuyState.COMPLETE,
                 promotionPriceQuantity, bonusQuantity, 0, regularPriceQuantity);
     }
@@ -45,28 +35,30 @@ public class BuyResult {
                 0, 0, 0, regularPriceQuantity);
     }
 
-    public BuyType getBuyType() {
-        return buyType;
+    public BuyResult applyBonusDecision(UserInputCommand userInputCommand) {
+        checkBonusAddableType();
+        checkBonusAddableState();
+        if (userInputCommand == UserInputCommand.YES) {
+            int promotionPriceQuantity = this.promotionPriceQuantity + pendingQuantity;
+            int bonusQuantity = this.bonusQuantity + 1;
+            return createPromotionCompleteResult(promotionPriceQuantity, bonusQuantity, 0);
+        }
+        if (userInputCommand == UserInputCommand.NO) {
+            return createPromotionCompleteResult(promotionPriceQuantity, bonusQuantity, pendingQuantity);
+        }
+        throw new IllegalStateException("지원하지 않는 명령입니다.");
     }
 
-    public BuyState getBuyState() {
-        return buyState;
+    private void checkBonusAddableType() {
+        if (this.buyType != BuyType.PROMOTION) {
+            throw new IllegalStateException("증정 상품 추가 여부를 처리할 수 없는 타입입니다.");
+        }
     }
 
-    public int getPromotionPriceQuantity() {
-        return promotionPriceQuantity;
-    }
-
-    public int getBonusQuantity() {
-        return bonusQuantity;
-    }
-
-    public int getPendingQuantity() {
-        return pendingQuantity;
-    }
-
-    public int getRegularPriceQuantity() {
-        return regularPriceQuantity;
+    private void checkBonusAddableState() {
+        if (this.buyState != BuyState.BONUS_ADDABLE) {
+            throw new IllegalStateException("증정 상품 추가 여부를 처리할 수 없는 상태입니다.");
+        }
     }
 
 }
