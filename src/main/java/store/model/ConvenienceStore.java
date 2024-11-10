@@ -22,7 +22,7 @@ public class ConvenienceStore {
         if (activePromotion.isPresent()) {
             return proceedPromotionOrder(findProducts, orderProduct, activePromotion.get());
         }
-        return proceedRegularOrder(findProducts, orderProduct);
+        return proceedRegularOrder(orderProduct);
     }
 
     private Optional<Promotion> findPromotionByName(String promotionName) {
@@ -105,9 +105,8 @@ public class ConvenienceStore {
                 .orElseThrow(() -> new IllegalArgumentException("프로모션 상품이 없습니다."));
     }
 
-    private BuyResult proceedRegularOrder(List<Product> products, OrderProduct orderProduct) {
-        // 일반 구매 진행
-        return null;
+    private BuyResult proceedRegularOrder(OrderProduct orderProduct) {
+        return BuyResult.createRegularCompleteResult(orderProduct.quantity());
     }
 
 }

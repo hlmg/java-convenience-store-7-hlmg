@@ -12,6 +12,36 @@ import org.junit.jupiter.api.Test;
 @SuppressWarnings("NonAsciiCharacters")
 class ConvenienceStoreTest {
 
+    @Test
+    void 없는_상품을_구매하면_예외가_발생한다() {
+        // given
+        List<Product> products = List.of(new Product("콜라", 1000, 10, null));
+        ConvenienceStore convenienceStore = new ConvenienceStore(products, List.of());
+
+        OrderProduct orderProduct = new OrderProduct("에너지바", 10);
+        LocalDate orderDate = LocalDate.parse("2024-11-01");
+
+        // when & then
+        assertThatThrownBy(() -> convenienceStore.buy(orderProduct, orderDate))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("존재하지 않는 상품입니다.");
+    }
+
+    @Test
+    void 재고보다_많은_수량을_구매하면_예외가_발생한다() {
+        // given
+        List<Product> products = List.of(new Product("콜라", 1000, 10, null));
+        ConvenienceStore convenienceStore = new ConvenienceStore(products, List.of());
+
+        OrderProduct orderProduct = new OrderProduct("콜라", 11);
+        LocalDate orderDate = LocalDate.parse("2024-11-01");
+
+        // when & then
+        assertThatThrownBy(() -> convenienceStore.buy(orderProduct, orderDate))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("재고 수량을 초과하여 구매할 수 없습니다.");
+    }
+
     @Nested
     @DisplayName("프로모션 재고가 부족하거나 구매 수량과 같은 경우")
     class promotionLowStock {
@@ -160,33 +190,56 @@ class ConvenienceStoreTest {
     }
 
     @Test
-    void 없는_상품을_구매하면_예외가_발생한다() {
+    void 프로모션이_없는_상품은_일반_주문으로_처리된다() {
         // given
-        List<Product> products = List.of(new Product("콜라", 1000, 10, null));
-        ConvenienceStore convenienceStore = new ConvenienceStore(products, List.of());
-
-        OrderProduct orderProduct = new OrderProduct("에너지바", 10);
+        List<Promotion> promotions = List.of(
+                new Promotion("2+1", 2, 1,
+                        LocalDate.parse("2024-11-01"), LocalDate.parse("2024-11-30"))
+        );
+        List<Product> products = List.of(
+                new Product("콜라", 1000, 10, null)
+        );
+        ConvenienceStore convenienceStore = new ConvenienceStore(products, promotions);
+        OrderProduct orderProduct = new OrderProduct("콜라", 9);
         LocalDate orderDate = LocalDate.parse("2024-11-01");
 
-        // when & then
-        assertThatThrownBy(() -> convenienceStore.buy(orderProduct, orderDate))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("존재하지 않는 상품입니다.");
+        // when
+        BuyResult buyResult = convenienceStore.buy(orderProduct, orderDate);
+
+        // then
+        assertThat(buyResult.getBuyType()).isSameAs(BuyType.REGULAR);
+        assertThat(buyResult.getBuyState()).isSameAs(BuyState.COMPLETE);
+        assertThat(buyResult.getPromotionPriceQuantity()).isEqualTo(0);
+        assertThat(buyResult.getBonusQuantity()).isEqualTo(0);
+        assertThat(buyResult.getPendingQuantity()).isEqualTo(0);
+        assertThat(buyResult.getRegularPriceQuantity()).isEqualTo(9);
     }
 
     @Test
-    void 재고보다_많은_수량을_구매하면_예외가_발생한다() {
+    void 프로모션_기간이_아닌_상품은_일반_주문으로_처리된다() {
         // given
-        List<Product> products = List.of(new Product("콜라", 1000, 10, null));
-        ConvenienceStore convenienceStore = new ConvenienceStore(products, List.of());
+        List<Promotion> promotions = List.of(
+                new Promotion("2+1", 2, 1,
+                        LocalDate.parse("2024-11-01"), LocalDate.parse("2024-11-30"))
+        );
+        List<Product> products = List.of(
+                new Product("콜라", 1000, 5, "2+1"),
+                new Product("콜라", 1000, 5, null)
+        );
+        ConvenienceStore convenienceStore = new ConvenienceStore(products, promotions);
+        OrderProduct orderProduct = new OrderProduct("콜라", 9);
+        LocalDate orderDate = LocalDate.parse("2024-12-01");
 
-        OrderProduct orderProduct = new OrderProduct("콜라", 11);
-        LocalDate orderDate = LocalDate.parse("2024-11-01");
+        // when
+        BuyResult buyResult = convenienceStore.buy(orderProduct, orderDate);
 
-        // when & then
-        assertThatThrownBy(() -> convenienceStore.buy(orderProduct, orderDate))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("재고 수량을 초과하여 구매할 수 없습니다.");
+        // then
+        assertThat(buyResult.getBuyType()).isSameAs(BuyType.REGULAR);
+        assertThat(buyResult.getBuyState()).isSameAs(BuyState.COMPLETE);
+        assertThat(buyResult.getPromotionPriceQuantity()).isEqualTo(0);
+        assertThat(buyResult.getBonusQuantity()).isEqualTo(0);
+        assertThat(buyResult.getPendingQuantity()).isEqualTo(0);
+        assertThat(buyResult.getRegularPriceQuantity()).isEqualTo(9);
     }
 
 }
