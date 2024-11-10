@@ -3,6 +3,7 @@ package store.controller;
 import camp.nextstep.edu.missionutils.DateTimes;
 import java.time.LocalDate;
 import java.util.List;
+import store.io.OutputView;
 import store.model.BuyResult;
 import store.model.BuyState;
 import store.model.ConvenienceStore;
@@ -16,10 +17,12 @@ public class StoreController {
 
     private final ProductFileReader productFileReader = new ProductFileReader();
     private final PromotionFileReader promotionFileReader = new PromotionFileReader();
+    private final OutputView outputView = new OutputView();
     private ConvenienceStore convenienceStore;
 
     public void run() {
         init();
+        outputView.printGreetingComment();
         List<OrderProduct> orderProducts = List.of(
                 new OrderProduct("콜라", 3),
                 new OrderProduct("에너지바", 5)
