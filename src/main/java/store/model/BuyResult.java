@@ -1,6 +1,8 @@
 package store.model;
 
 public record BuyResult(
+        String productName,
+        int price,
         BuyType buyType,
         BuyState buyState,
         int promotionPriceQuantity,
@@ -9,56 +11,72 @@ public record BuyResult(
         int regularPriceQuantity
 ) {
 
-    public static BuyResult createPromotionCompleteResult(int promotionPriceQuantity, int bonusQuantity,
+    public static BuyResult createPromotionCompleteResult(String productName, int price, int promotionPriceQuantity, int bonusQuantity,
                                                           int regularPriceQuantity) {
-        return new BuyResult(BuyType.PROMOTION, BuyState.COMPLETE,
+        return new BuyResult(productName, price, store.model.BuyType.PROMOTION, BuyState.COMPLETE,
                 promotionPriceQuantity, bonusQuantity, 0, regularPriceQuantity);
     }
 
-    public static BuyResult createPartiallyPromotedResult(int promotionPriceQuantity, int bonusQuantity,
+    public static BuyResult createPartiallyPromotedResult(String productName, int price, int promotionPriceQuantity, int bonusQuantity,
                                                           int pendingQuantity) {
         if (pendingQuantity == 0) {
-            return createPromotionCompleteResult(promotionPriceQuantity, bonusQuantity, 0);
+            return createPromotionCompleteResult(productName, price, promotionPriceQuantity, bonusQuantity, 0);
         }
-        return new BuyResult(BuyType.PROMOTION, BuyState.PARTIALLY_PROMOTED,
+        return new BuyResult(productName, price, BuyType.PROMOTION, BuyState.PARTIALLY_PROMOTED,
                 promotionPriceQuantity, bonusQuantity, pendingQuantity, 0);
     }
 
-    public static BuyResult createBonusAddableResult(int promotionPriceQuantity, int bonusQuantity,
+    public static BuyResult createBonusAddableResult(String productName, int price, int promotionPriceQuantity, int bonusQuantity,
                                                      int pendingQuantity) {
-        return new BuyResult(BuyType.PROMOTION, BuyState.BONUS_ADDABLE,
+        return new BuyResult(productName, price, BuyType.PROMOTION, BuyState.BONUS_ADDABLE,
                 promotionPriceQuantity, bonusQuantity, pendingQuantity, 0);
     }
 
-    public static BuyResult createRegularCompleteResult(int regularPriceQuantity) {
-        return new BuyResult(BuyType.REGULAR, BuyState.COMPLETE,
+    public static BuyResult createRegularCompleteResult(String productName, int price, int regularPriceQuantity) {
+        return new BuyResult(productName, price, BuyType.REGULAR, BuyState.COMPLETE,
                 0, 0, 0, regularPriceQuantity);
     }
 
-    public BuyResult applyBonusDecision(UserInputCommand userInputCommand) {
+    public BuyResult applyBonusDecision(UserInputCommand bonusDecision) {
         checkBonusAddableType();
         checkBonusAddableState();
-        if (userInputCommand == UserInputCommand.YES) {
+        if (bonusDecision == UserInputCommand.YES) {
             int promotionPriceQuantity = this.promotionPriceQuantity + pendingQuantity;
             int bonusQuantity = this.bonusQuantity + 1;
-            return createPromotionCompleteResult(promotionPriceQuantity, bonusQuantity, 0);
+            return createPromotionCompleteResult(productName, price, promotionPriceQuantity, bonusQuantity, 0);
         }
-        if (userInputCommand == UserInputCommand.NO) {
-            return createPromotionCompleteResult(promotionPriceQuantity, bonusQuantity, pendingQuantity);
+        if (bonusDecision == UserInputCommand.NO) {
+            return createPromotionCompleteResult(productName, price, promotionPriceQuantity, bonusQuantity, pendingQuantity);
         }
         throw new IllegalStateException("지원하지 않는 명령입니다.");
     }
 
-    public BuyResult applyRegularPricePaymentDecision(UserInputCommand userInputCommand) {
+    public BuyResult applyRegularPricePaymentDecision(UserInputCommand regularPricePaymentDecision) {
         checkRegularPricePaymentType();
         checkRegularPricePaymentState();
-        if (userInputCommand == UserInputCommand.YES) {
-            return createPromotionCompleteResult(promotionPriceQuantity, bonusQuantity, pendingQuantity);
+        if (regularPricePaymentDecision == UserInputCommand.YES) {
+            return createPromotionCompleteResult(productName, price, promotionPriceQuantity, bonusQuantity, pendingQuantity);
         }
-        if (userInputCommand == UserInputCommand.NO) {
-            return createPromotionCompleteResult(promotionPriceQuantity, bonusQuantity, 0);
+        if (regularPricePaymentDecision == UserInputCommand.NO) {
+            return createPromotionCompleteResult(productName, price, promotionPriceQuantity, bonusQuantity, 0);
         }
         throw new IllegalStateException("지원하지 않는 명령입니다.");
+    }
+
+    public int getTotalBuyPrice() {
+        return price * getTotalBuyQuantity();
+    }
+
+    public int getPromotionDiscountPrice() {
+        return price * bonusQuantity;
+    }
+
+    public int getRegularBuyPrice() {
+        return price * regularPriceQuantity;
+    }
+
+    public int getTotalBuyQuantity() {
+        return promotionPriceQuantity + bonusQuantity + regularPriceQuantity;
     }
 
     private void checkBonusAddableType() {

@@ -25,22 +25,16 @@ public class ConvenienceStore {
         return proceedRegularOrder(orderProduct);
     }
 
-    private Optional<Promotion> findPromotionByName(String promotionName) {
-        return promotions.stream()
-                .filter(promotion -> promotion.nameEquals(promotionName))
-                .findAny();
+    private List<Product> findProductsByName(String name) {
+        return products.stream()
+                .filter(product -> product.nameEquals(name))
+                .toList();
     }
 
     private void checkProductExist(List<Product> products) {
         if (products.isEmpty()) {
             throw new IllegalArgumentException("존재하지 않는 상품입니다.");
         }
-    }
-
-    private List<Product> findProductsByName(String name) {
-        return products.stream()
-                .filter(product -> product.nameEquals(name))
-                .toList();
     }
 
     private void checkEnoughStock(List<Product> products, int orderQuantity) {
@@ -51,16 +45,22 @@ public class ConvenienceStore {
 
     private int getStock(List<Product> products) {
         return products.stream()
-                .mapToInt(Product::getQuantity)
+                .mapToInt(Product::quantity)
                 .sum();
     }
 
     private Optional<Promotion> getActivePromotion(List<Product> products, LocalDate orderDate) {
         return products.stream()
-                .map(Product::getPromotion)
+                .map(Product::promotion)
                 .map(this::findPromotionByName)
                 .flatMap(Optional::stream)
                 .filter(promotion -> promotion.isActiveOn(orderDate))
+                .findAny();
+    }
+
+    private Optional<Promotion> findPromotionByName(String promotionName) {
+        return promotions.stream()
+                .filter(promotion -> promotion.nameEquals(promotionName))
                 .findAny();
     }
 
@@ -81,32 +81,43 @@ public class ConvenienceStore {
         PromotionResult promotionResult = promotion.apply(promotionStock);
 
         int pendingQuantity = (orderProduct.quantity() - promotionStock) + promotionResult.remain();
-        return BuyResult.createPartiallyPromotedResult(promotionResult.buy(), promotionResult.get(),
+        int price = findPriceByName(orderProduct.name());
+        return BuyResult.createPartiallyPromotedResult(orderProduct.name(), price, promotionResult.buy(),
+                promotionResult.get(),
                 pendingQuantity);
     }
 
     private BuyResult proceedFullStockPromotion(OrderProduct orderProduct, Promotion promotion) {
         PromotionResult promotionResult = promotion.apply(orderProduct.quantity());
-
         int pendingQuantity = promotionResult.remain();
+        int price = findPriceByName(orderProduct.name());
         if (promotion.isBonusApplicable(promotionResult.remain())) {
-            return BuyResult.createBonusAddableResult(promotionResult.buy(), promotionResult.get(),
-                    pendingQuantity);
+            return BuyResult.createBonusAddableResult(orderProduct.name(), price, promotionResult.buy(),
+                    promotionResult.get(), pendingQuantity);
         }
-        return BuyResult.createPartiallyPromotedResult(promotionResult.buy(), promotionResult.get(),
-                pendingQuantity);
+        return BuyResult.createPartiallyPromotedResult(orderProduct.name(), price, promotionResult.buy(),
+                promotionResult.get(), pendingQuantity);
     }
 
     private int getPromotionStock(List<Product> products) {
         return products.stream()
                 .filter(Product::hasPromotion)
-                .mapToInt(Product::getQuantity)
+                .mapToInt(Product::quantity)
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("프로모션 상품이 없습니다."));
     }
 
+    private int findPriceByName(String name) {
+        Product findProduct = products.stream()
+                .filter(product -> product.nameEquals(name))
+                .findAny()
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+        return findProduct.price();
+    }
+
     private BuyResult proceedRegularOrder(OrderProduct orderProduct) {
-        return BuyResult.createRegularCompleteResult(orderProduct.quantity());
+        int price = findPriceByName(orderProduct.name());
+        return BuyResult.createRegularCompleteResult(orderProduct.name(), price, orderProduct.quantity());
     }
 
 }
