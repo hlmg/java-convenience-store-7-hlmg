@@ -20,9 +20,9 @@ public class ConvenienceStore {
         checkEnoughStock(findProducts, orderProduct.quantity());
         Optional<Promotion> activePromotion = getActivePromotion(findProducts, orderDate);
         if (activePromotion.isPresent()) {
-            return processPromotionOrder(orderProduct, activePromotion.get());
+            return proceedPromotionOrder(findProducts, orderProduct, activePromotion.get());
         }
-        return processRegularOrder(orderProduct);
+        return proceedRegularOrder(findProducts, orderProduct);
     }
 
     private Optional<Promotion> findPromotionByName(String promotionName) {
@@ -64,12 +64,48 @@ public class ConvenienceStore {
                 .findAny();
     }
 
-    private BuyResult processPromotionOrder(OrderProduct orderProduct, Promotion promotion) {
-        // 프로모션 구매 진행
-        return null;
+    private BuyResult proceedPromotionOrder(List<Product> products, OrderProduct orderProduct, Promotion promotion) {
+        if (isPromotionStockLow(products, orderProduct.quantity())) {
+            return proceedLowStockPromotion(products, orderProduct, promotion);
+        }
+        return proceedFullStockPromotion(orderProduct, promotion);
     }
 
-    private BuyResult processRegularOrder(OrderProduct orderProduct) {
+    private boolean isPromotionStockLow(List<Product> products, int buyQuantity) {
+        int promotionStock = getPromotionStock(products);
+        return promotionStock <= buyQuantity;
+    }
+
+    private BuyResult proceedLowStockPromotion(List<Product> products, OrderProduct orderProduct, Promotion promotion) {
+        int promotionStock = getPromotionStock(products);
+        PromotionResult promotionResult = promotion.apply(promotionStock);
+
+        int pendingQuantity = (orderProduct.quantity() - promotionStock) + promotionResult.remain();
+        return BuyResult.createPartiallyPromotedResult(promotionResult.buy(), promotionResult.get(),
+                pendingQuantity);
+    }
+
+    private BuyResult proceedFullStockPromotion(OrderProduct orderProduct, Promotion promotion) {
+        PromotionResult promotionResult = promotion.apply(orderProduct.quantity());
+
+        int pendingQuantity = promotionResult.remain();
+        if (promotion.isBonusApplicable(promotionResult.remain())) {
+            return BuyResult.createBonusAddableResult(promotionResult.buy(), promotionResult.get(),
+                    pendingQuantity);
+        }
+        return BuyResult.createPartiallyPromotedResult(promotionResult.buy(), promotionResult.get(),
+                pendingQuantity);
+    }
+
+    private int getPromotionStock(List<Product> products) {
+        return products.stream()
+                .filter(Product::hasPromotion)
+                .mapToInt(Product::getQuantity)
+                .findAny()
+                .orElseThrow(() -> new IllegalArgumentException("프로모션 상품이 없습니다."));
+    }
+
+    private BuyResult proceedRegularOrder(List<Product> products, OrderProduct orderProduct) {
         // 일반 구매 진행
         return null;
     }

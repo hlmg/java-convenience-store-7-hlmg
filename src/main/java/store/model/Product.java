@@ -26,4 +26,8 @@ public class Product {
         return promotion;
     }
 
+    public boolean hasPromotion() {
+        return promotion != null;
+    }
+
 }

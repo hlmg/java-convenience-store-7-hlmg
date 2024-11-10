@@ -3,6 +3,8 @@ package store.controller;
 import camp.nextstep.edu.missionutils.DateTimes;
 import java.time.LocalDate;
 import java.util.List;
+import store.model.BuyResult;
+import store.model.BuyState;
 import store.model.ConvenienceStore;
 import store.model.OrderProduct;
 import store.model.Product;
@@ -34,8 +36,18 @@ public class StoreController {
         convenienceStore = new ConvenienceStore(products, promotions);
     }
 
-    private void purchase(OrderProduct orderProduct, LocalDate orderDate) {
-        convenienceStore.buy(orderProduct, orderDate);
+    private BuyResult purchase(OrderProduct orderProduct, LocalDate orderDate) {
+        BuyResult buyResult = convenienceStore.buy(orderProduct, orderDate);
+        if (buyResult.getBuyState() == BuyState.COMPLETE) {
+            return buyResult;
+        }
+        if (buyResult.getBuyState() == BuyState.BONUS_ADDABLE) {
+            return null; // 보너스 추가 여부 묻기
+        }
+        if (buyResult.getBuyState() == BuyState.PARTIALLY_PROMOTED) {
+            return null; // 정가 결제 여부 묻기
+        }
+        throw new IllegalStateException("지원하지 않는 주문 상태입니다.");
     }
 
 }

@@ -26,4 +26,15 @@ public class Promotion {
         return !(date.isBefore(startDate) || date.isAfter(endDate));
     }
 
+    public PromotionResult apply(int quantity) {
+        int unit = buy + get;
+        int promotionCount = quantity / unit;
+        int remain = quantity % unit;
+        return new PromotionResult(buy * promotionCount, get * promotionCount, remain);
+    }
+
+    public boolean isBonusApplicable(int quantity) {
+        return buy == quantity;
+    }
+
 }
