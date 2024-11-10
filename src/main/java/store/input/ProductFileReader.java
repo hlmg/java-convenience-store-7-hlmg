@@ -35,8 +35,15 @@ public class ProductFileReader {
                 product.get(0),
                 toInt(product.get(1)),
                 toInt(product.get(2)),
-                product.get(3)
+                getPromotion(product.get(3))
         );
+    }
+
+    private String getPromotion(String promotion) {
+        if (promotion.equals("null")) {
+            return null;
+        }
+        return promotion;
     }
 
     private int toInt(String value) {

@@ -23,6 +23,7 @@ public class StoreController {
     public void run() {
         init();
         outputView.printGreetingComment();
+        outputView.printProducts(convenienceStore.getProducts());
         List<OrderProduct> orderProducts = List.of(
                 new OrderProduct("콜라", 3),
                 new OrderProduct("에너지바", 5)

@@ -1,6 +1,7 @@
 package store.model;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +24,10 @@ public class ConvenienceStore {
             return proceedPromotionOrder(findProducts, orderProduct, activePromotion.get());
         }
         return proceedRegularOrder(orderProduct);
+    }
+
+    public List<Product> getProducts() {
+        return Collections.unmodifiableList(products);
     }
 
     private List<Product> findProductsByName(String name) {
