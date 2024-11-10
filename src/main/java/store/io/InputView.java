@@ -33,6 +33,11 @@ public class InputView {
         return getUserInputCommand();
     }
 
+    public UserInputCommand askMembershipDiscount() {
+        System.out.println("멤버십 할인을 받으시겠습니까? (Y/N)");
+        return getUserInputCommand();
+    }
+
     private OrderProduct toOrderProduct(String orderProduct) {
         Matcher matcher = ORDER_PRODUCT_PATTERN.matcher(orderProduct);
         if (!matcher.matches()) {

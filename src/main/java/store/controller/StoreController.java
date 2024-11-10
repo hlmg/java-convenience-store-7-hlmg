@@ -2,6 +2,7 @@ package store.controller;
 
 import camp.nextstep.edu.missionutils.DateTimes;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import store.io.InputView;
 import store.io.OutputView;
@@ -13,6 +14,7 @@ import store.model.Product;
 import store.model.Promotion;
 import store.input.ProductFileReader;
 import store.input.PromotionFileReader;
+import store.model.Receipt;
 import store.model.UserInputCommand;
 
 public class StoreController {
@@ -30,9 +32,13 @@ public class StoreController {
         List<OrderProduct> orderProducts = inputView.getOrderProductsFromUser();
         LocalDate orderDate = DateTimes.now().toLocalDate();
         // TODO: 상품을 구매하기 전에, 존재하지 않는 상품인지, 재고 수량을 초과했는지, 중복 상품이 존재하는지 확인해야 함.
+        List<BuyResult> buyResults = new ArrayList<>();
         for (OrderProduct orderProduct : orderProducts) {
-            purchase(orderProduct, orderDate);
+            buyResults.add(purchase(orderProduct, orderDate));
         }
+        Receipt receipt = new Receipt(buyResults);
+        UserInputCommand membershipDecision = inputView.askMembershipDiscount();
+        receipt.updateMembershipDecision(membershipDecision);
     }
 
     private void init() {
