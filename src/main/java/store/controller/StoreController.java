@@ -3,6 +3,7 @@ package store.controller;
 import camp.nextstep.edu.missionutils.DateTimes;
 import java.time.LocalDate;
 import java.util.List;
+import store.io.InputView;
 import store.io.OutputView;
 import store.model.BuyResult;
 import store.model.BuyState;
@@ -18,17 +19,16 @@ public class StoreController {
     private final ProductFileReader productFileReader = new ProductFileReader();
     private final PromotionFileReader promotionFileReader = new PromotionFileReader();
     private final OutputView outputView = new OutputView();
+    private final InputView inputView = new InputView();
     private ConvenienceStore convenienceStore;
 
     public void run() {
         init();
         outputView.printGreetingComment();
         outputView.printProducts(convenienceStore.getProducts());
-        List<OrderProduct> orderProducts = List.of(
-                new OrderProduct("콜라", 3),
-                new OrderProduct("에너지바", 5)
-        );
+        List<OrderProduct> orderProducts = inputView.getOrderProductsFromUser();
         LocalDate orderDate = DateTimes.now().toLocalDate();
+        // TODO: 상품을 구매하기 전에, 존재하지 않는 상품인지, 재고 수량을 초과했는지, 중복 상품이 존재하는지 확인해야 함.
         for (OrderProduct orderProduct : orderProducts) {
             purchase(orderProduct, orderDate);
         }
