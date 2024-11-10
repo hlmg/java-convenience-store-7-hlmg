@@ -57,4 +57,50 @@ class BuyResultTest {
                 .hasMessage("증정 상품 추가 여부를 처리할 수 없는 상태입니다.");
     }
 
+    @CsvSource(textBlock = """
+            YES,COMPLETE,4,2,0,2
+            NO,COMPLETE,4,2,0,0
+            """)
+    @ParameterizedTest
+    void 정가_결제_여부를_처리할_수_있다(UserInputCommand userInputCommand, BuyState buyState, int promotionPriceQuantity,
+                               int bonusQuantity, int pendingQuantity, int regularPriceQuantity) {
+        // given
+        BuyResult buyResult = new BuyResult(BuyType.PROMOTION, BuyState.PARTIALLY_PROMOTED, 4, 2, 2, 0);
+
+        // when
+        BuyResult finalResult = buyResult.applyRegularPricePaymentDecision(userInputCommand);
+
+        // then
+        assertThat(finalResult.buyState()).isSameAs(buyState);
+        assertThat(finalResult.promotionPriceQuantity()).isSameAs(promotionPriceQuantity);
+        assertThat(finalResult.bonusQuantity()).isSameAs(bonusQuantity);
+        assertThat(finalResult.pendingQuantity()).isSameAs(pendingQuantity);
+        assertThat(finalResult.regularPriceQuantity()).isSameAs(regularPriceQuantity);
+    }
+
+    @Test
+    void 정가_결제_여부를_처리할_수_없는_타입이면_예외가_발생한다() {
+        // given
+        BuyResult buyResult = new BuyResult(BuyType.REGULAR, BuyState.PARTIALLY_PROMOTED, 4, 2, 2, 0);
+        UserInputCommand userInputCommand = UserInputCommand.YES;
+
+        // when & then
+        assertThatThrownBy(() -> buyResult.applyRegularPricePaymentDecision(userInputCommand))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("정가 결제 여부를 처리할 수 없는 타입입니다.");
+    }
+
+    @ValueSource(strings = {"COMPLETE", "BONUS_ADDABLE"})
+    @ParameterizedTest
+    void 정가_결제_여부를_처리할_수_없는_상태면_예외가_발생한다(BuyState buyState) {
+        // given
+        BuyResult buyResult = new BuyResult(BuyType.PROMOTION, buyState, 4, 2, 2, 0);
+        UserInputCommand userInputCommand = UserInputCommand.YES;
+
+        // when & then
+        assertThatThrownBy(() -> buyResult.applyRegularPricePaymentDecision(userInputCommand))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("정가 결제 여부를 처리할 수 없는 상태입니다.");
+    }
+
 }

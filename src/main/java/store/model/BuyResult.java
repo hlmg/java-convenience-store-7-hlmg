@@ -49,6 +49,18 @@ public record BuyResult(
         throw new IllegalStateException("지원하지 않는 명령입니다.");
     }
 
+    public BuyResult applyRegularPricePaymentDecision(UserInputCommand userInputCommand) {
+        checkRegularPricePaymentType();
+        checkRegularPricePaymentState();
+        if (userInputCommand == UserInputCommand.YES) {
+            return createPromotionCompleteResult(promotionPriceQuantity, bonusQuantity, pendingQuantity);
+        }
+        if (userInputCommand == UserInputCommand.NO) {
+            return createPromotionCompleteResult(promotionPriceQuantity, bonusQuantity, 0);
+        }
+        throw new IllegalStateException("지원하지 않는 명령입니다.");
+    }
+
     private void checkBonusAddableType() {
         if (this.buyType != BuyType.PROMOTION) {
             throw new IllegalStateException("증정 상품 추가 여부를 처리할 수 없는 타입입니다.");
@@ -58,6 +70,18 @@ public record BuyResult(
     private void checkBonusAddableState() {
         if (this.buyState != BuyState.BONUS_ADDABLE) {
             throw new IllegalStateException("증정 상품 추가 여부를 처리할 수 없는 상태입니다.");
+        }
+    }
+
+    private void checkRegularPricePaymentType() {
+        if (this.buyType != BuyType.PROMOTION) {
+            throw new IllegalStateException("정가 결제 여부를 처리할 수 없는 타입입니다.");
+        }
+    }
+
+    private void checkRegularPricePaymentState() {
+        if (this.buyState != BuyState.PARTIALLY_PROMOTED) {
+            throw new IllegalStateException("정가 결제 여부를 처리할 수 없는 상태입니다.");
         }
     }
 
