@@ -51,7 +51,9 @@ public class StoreController {
             return buyResult.applyBonusDecision(bonusAddDecision);
         }
         if (buyResult.buyState() == BuyState.PARTIALLY_PROMOTED) {
-            return null; // 정가 결제 여부 묻기
+            UserInputCommand regularPricePaymentDecision = inputView.askRegularPricePayment(buyResult.productName(),
+                    buyResult.pendingQuantity());
+            return buyResult.applyRegularPricePaymentDecision(regularPricePaymentDecision);
         }
         throw new IllegalStateException("지원하지 않는 주문 상태입니다.");
     }

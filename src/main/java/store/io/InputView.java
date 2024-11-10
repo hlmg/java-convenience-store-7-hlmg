@@ -24,8 +24,13 @@ public class InputView {
     public UserInputCommand askAddBonus(String productName) {
         String message = String.format("현재 %s은(는) 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)", productName);
         System.out.println(message);
-        String userInput = Console.readLine();
-        return UserInputCommand.from(userInput);
+        return getUserInputCommand();
+    }
+
+    public UserInputCommand askRegularPricePayment(String productName, int quantity) {
+        String message = String.format("현재 %s %d개는 프로모션 할인이 적용되지 않습니다. 그래도 구매하시겠습니까? (Y/N)", productName, quantity);
+        System.out.println(message);
+        return getUserInputCommand();
     }
 
     private OrderProduct toOrderProduct(String orderProduct) {
@@ -42,6 +47,11 @@ public class InputView {
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("숫자로 변환할 수 없습니다.");
         }
+    }
+
+    private UserInputCommand getUserInputCommand() {
+        String userInput = Console.readLine();
+        return UserInputCommand.from(userInput);
     }
 
 }
