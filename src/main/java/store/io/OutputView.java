@@ -3,8 +3,8 @@ package store.io;
 import java.util.List;
 import store.exception.StoreException;
 import store.model.BuyResult;
-import store.model.Product;
 import store.model.Receipt;
+import store.model.SellingProduct;
 
 public class OutputView {
 
@@ -12,19 +12,30 @@ public class OutputView {
         println("안녕하세요. W편의점입니다.");
     }
 
-    public void printProducts(List<Product> products) {
+    public void printSellingProducts(List<SellingProduct> products) {
         println("현재 보유하고 있는 상품입니다.");
         printEmptyLine();
         products.forEach(this::printProduct);
         printEmptyLine();
     }
 
-    private void printProduct(Product product) {
-        String stockMessage = getStockMessage(product.getQuantity());
-        String productMessage = String.format("- %s %,d원 %s", product.getName(), product.getPrice(), stockMessage);
+    private void printProduct(SellingProduct product) {
         if (product.hasPromotion()) {
-            productMessage += " " + product.getPromotion();
+            printPromotionProduct(product);
         }
+        printRegularProduct(product);
+    }
+
+    private void printPromotionProduct(SellingProduct product) {
+        String stockMessage = getStockMessage(product.getPromotionStock());
+        String productMessage = String.format("- %s %,d원 %s %s", product.getName(), product.getPrice(), stockMessage,
+                product.getPromotion());
+        println(productMessage);
+    }
+
+    private void printRegularProduct(SellingProduct product) {
+        String stockMessage = getStockMessage(product.getRegularStock());
+        String productMessage = String.format("- %s %,d원 %s", product.getName(), product.getPrice(), stockMessage);
         println(productMessage);
     }
 

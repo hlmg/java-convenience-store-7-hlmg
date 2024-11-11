@@ -1,155 +1,76 @@
 package store.model;
 
 import java.time.LocalDate;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import store.exception.StoreException;
 
 public class ConvenienceStore {
 
-    private final List<Product> products;
-    private final List<Promotion> promotions;
+    private final SellingProducts sellingProducts;
+    private final Promotions promotions;
 
     public ConvenienceStore(List<Product> products, List<Promotion> promotions) {
-        this.products = products;
-        this.promotions = promotions;
+        this.sellingProducts = new SellingProducts(products);
+        this.promotions = new Promotions(promotions);
     }
 
-    public void validateOrderProducts(List<OrderProduct> orderProducts) {
-        checkProductExist(orderProducts);
-        checkEnoughStock(orderProducts);
+    public List<SellingProduct> getSellingProducts() {
+        return sellingProducts.getProducts();
     }
 
-    private void checkProductExist(List<OrderProduct> orderProducts) {
+    public List<BuyResult> order(List<OrderProduct> orderProducts, LocalDate orderDate) {
+        List<BuyResult> buyResults = new ArrayList<>();
         for (OrderProduct orderProduct : orderProducts) {
-            List<Product> products = findProductsByName(orderProduct.name());
-            if (products.isEmpty()) {
-                throw new StoreException("존재하지 않는 상품입니다.");
-            }
+            buyResults.add(buy(orderProduct, orderDate));
         }
+        return buyResults;
     }
 
-    private void checkEnoughStock(List<OrderProduct> orderProducts) {
-        for (OrderProduct orderProduct : orderProducts) {
-            int orderQuantity = orderProduct.quantity();
-            List<Product> products = findProductsByName(orderProduct.name());
-            if (getStock(products) < orderQuantity) {
-                throw new StoreException("재고 수량을 초과하여 구매할 수 없습니다.");
-            }
+    private BuyResult buy(OrderProduct orderProduct, LocalDate orderDate) {
+        SellingProduct sellingProduct = sellingProducts.getProductBy(orderProduct.name());
+        int stock = sellingProduct.getStock();
+        if (stock < orderProduct.quantity()) {
+            throw new StoreException("재고 수량을 초과하여 구매할 수 없습니다.");
         }
-    }
-
-    private int getStock(List<Product> products) {
-        return products.stream()
-                .mapToInt(Product::getQuantity)
-                .sum();
-    }
-
-    public BuyResult buy(OrderProduct orderProduct, LocalDate orderDate) {
-        List<Product> findProducts = findProductsByName(orderProduct.name());
-        Optional<Promotion> activePromotion = getActivePromotion(findProducts, orderDate);
-        if (activePromotion.isPresent()) {
-            return proceedPromotionOrder(findProducts, orderProduct, activePromotion.get());
+        Optional<Promotion> promotion = promotions.findActivePromotion(sellingProduct.getPromotion(), orderDate);
+        if (promotion.isPresent()) {
+            return proceedPromotionOrder(sellingProduct, orderProduct, promotion.get());
         }
-        return proceedRegularOrder(orderProduct);
-    }
-
-    public List<Product> getProducts() {
-        return Collections.unmodifiableList(products);
+        return proceedRegularOrder(sellingProduct, orderProduct);
     }
 
     public void deductProductsStock(List<BuyResult> buyResults) {
-        // TODO: 로직 개선하기
         for (BuyResult buyResult : buyResults) {
             String productName = buyResult.productName();
-            List<Product> products = findProductsByName(productName);
-            Optional<Product> promotionProduct = findPromotionProduct(products);
-            Optional<Product> regularProduct = findRegularProduct(products);
-            if (buyResult.buyType() == BuyType.PROMOTION) {
-                int buyQuantity = buyResult.getTotalBuyQuantity();
-                if (promotionProduct.isPresent()) {
-                    Product product = promotionProduct.get();
-                    buyQuantity = product.deductStock(buyQuantity);
-                }
-                if (regularProduct.isPresent()) {
-                    Product product = regularProduct.get();
-                    product.deductStock(buyQuantity);
-                }
-                continue;
-            }
-            int buyQuantity = buyResult.getTotalBuyQuantity();
-            if (regularProduct.isPresent()) {
-                Product product = regularProduct.get();
-                buyQuantity = product.deductStock(buyQuantity);
-            }
-            if (promotionProduct.isPresent()) {
-                Product product = promotionProduct.get();
-                product.deductStock(buyQuantity);
-            }
+            SellingProduct sellingProduct = sellingProducts.getProductBy(productName);
+            sellingProduct.deductStock(buyResult.getTotalBuyQuantity(), BuyType.PROMOTION);
         }
     }
 
-    private Optional<Product> findPromotionProduct(List<Product> products) {
-        return products.stream()
-                .filter(Product::hasPromotion)
-                .findAny();
-    }
-
-    private Optional<Product> findRegularProduct(List<Product> products) {
-        return products.stream()
-                .filter(product -> !product.hasPromotion())
-                .findAny();
-    }
-
-    private List<Product> findProductsByName(String name) {
-        return products.stream()
-                .filter(product -> product.nameEquals(name))
-                .toList();
-    }
-
-    private Optional<Promotion> getActivePromotion(List<Product> products, LocalDate orderDate) {
-        return products.stream()
-                .map(Product::getPromotion)
-                .map(this::findPromotionByName)
-                .flatMap(Optional::stream)
-                .filter(promotion -> promotion.isActiveOn(orderDate))
-                .findAny();
-    }
-
-    private Optional<Promotion> findPromotionByName(String promotionName) {
-        return promotions.stream()
-                .filter(promotion -> promotion.nameEquals(promotionName))
-                .findAny();
-    }
-
-    private BuyResult proceedPromotionOrder(List<Product> products, OrderProduct orderProduct, Promotion promotion) {
-        if (isPromotionStockLow(products, orderProduct.quantity())) {
-            return proceedLowStockPromotion(products, orderProduct, promotion);
+    private BuyResult proceedPromotionOrder(SellingProduct sellingProduct, OrderProduct orderProduct, Promotion promotion) {
+        if (sellingProduct.ifPromotionStockLessThanOrEquals(orderProduct.quantity())) {
+            return proceedLowStockPromotion(sellingProduct, orderProduct, promotion);
         }
-        return proceedFullStockPromotion(orderProduct, promotion);
+        return proceedFullStockPromotion(sellingProduct, orderProduct, promotion);
     }
 
-    private boolean isPromotionStockLow(List<Product> products, int buyQuantity) {
-        int promotionStock = getPromotionStock(products);
-        return promotionStock <= buyQuantity;
-    }
-
-    private BuyResult proceedLowStockPromotion(List<Product> products, OrderProduct orderProduct, Promotion promotion) {
-        int promotionStock = getPromotionStock(products);
+    private BuyResult proceedLowStockPromotion(SellingProduct sellingProduct, OrderProduct orderProduct, Promotion promotion) {
+        int promotionStock = sellingProduct.getPromotionStock();
         PromotionResult promotionResult = promotion.apply(promotionStock);
 
         int pendingQuantity = (orderProduct.quantity() - promotionStock) + promotionResult.remain();
-        int price = findPriceByName(orderProduct.name());
+        int price = sellingProduct.getPrice();
         return BuyResult.createPartiallyPromotedResult(orderProduct.name(), price, promotionResult.buy(),
                 promotionResult.get(),
                 pendingQuantity);
     }
 
-    private BuyResult proceedFullStockPromotion(OrderProduct orderProduct, Promotion promotion) {
+    private BuyResult proceedFullStockPromotion(SellingProduct sellingProduct, OrderProduct orderProduct, Promotion promotion) {
         PromotionResult promotionResult = promotion.apply(orderProduct.quantity());
         int pendingQuantity = promotionResult.remain();
-        int price = findPriceByName(orderProduct.name());
+        int price = sellingProduct.getPrice();
         if (promotion.isBonusApplicable(promotionResult.remain())) {
             return BuyResult.createBonusAddableResult(orderProduct.name(), price, promotionResult.buy(),
                     promotionResult.get(), pendingQuantity);
@@ -158,24 +79,8 @@ public class ConvenienceStore {
                 promotionResult.get(), pendingQuantity);
     }
 
-    private int getPromotionStock(List<Product> products) {
-        return products.stream()
-                .filter(Product::hasPromotion)
-                .mapToInt(Product::getQuantity)
-                .findAny()
-                .orElseThrow(() -> new IllegalArgumentException("프로모션 상품이 없습니다."));
-    }
-
-    private int findPriceByName(String name) {
-        Product findProduct = products.stream()
-                .filter(product -> product.nameEquals(name))
-                .findAny()
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
-        return findProduct.getPrice();
-    }
-
-    private BuyResult proceedRegularOrder(OrderProduct orderProduct) {
-        int price = findPriceByName(orderProduct.name());
+    private BuyResult proceedRegularOrder(SellingProduct sellingProduct, OrderProduct orderProduct) {
+        int price = sellingProduct.getPrice();
         return BuyResult.createRegularCompleteResult(orderProduct.name(), price, orderProduct.quantity());
     }
 

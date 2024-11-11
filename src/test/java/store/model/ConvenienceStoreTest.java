@@ -1,5 +1,6 @@
 package store.model;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -20,9 +21,10 @@ class ConvenienceStoreTest {
         ConvenienceStore convenienceStore = new ConvenienceStore(products, List.of());
 
         List<OrderProduct> orderProduct = List.of(new OrderProduct("에너지바", 10));
+        LocalDate orderDate = LocalDate.parse("2024-11-01");
 
         // when & then
-        assertThatThrownBy(() -> convenienceStore.validateOrderProducts(orderProduct))
+        assertThatThrownBy(() -> convenienceStore.order(orderProduct, orderDate))
                 .isInstanceOf(StoreException.class)
                 .hasMessage("존재하지 않는 상품입니다.");
     }
@@ -37,7 +39,7 @@ class ConvenienceStoreTest {
         LocalDate orderDate = LocalDate.parse("2024-11-01");
 
         // when & then
-        assertThatThrownBy(() -> convenienceStore.validateOrderProducts(orderProduct))
+        assertThatThrownBy(() -> convenienceStore.order(orderProduct, orderDate))
                 .isInstanceOf(StoreException.class)
                 .hasMessage("재고 수량을 초과하여 구매할 수 없습니다.");
     }
@@ -58,19 +60,17 @@ class ConvenienceStoreTest {
                     new Product("콜라", 1000, 10, null)
             );
             ConvenienceStore convenienceStore = new ConvenienceStore(products, promotions);
-            OrderProduct orderProduct = new OrderProduct("콜라", 8);
+            List<OrderProduct> orderProducts = List.of(new OrderProduct("콜라", 8));
             LocalDate orderDate = LocalDate.parse("2024-11-01");
 
             // when
-            BuyResult buyResult = convenienceStore.buy(orderProduct, orderDate);
+            List<BuyResult> buyResults = convenienceStore.order(orderProducts, orderDate);
 
             // then
-            assertThat(buyResult.buyType()).isSameAs(BuyType.PROMOTION);
-            assertThat(buyResult.buyState()).isSameAs(BuyState.PARTIALLY_PROMOTED);
-            assertThat(buyResult.promotionPriceQuantity()).isEqualTo(4);
-            assertThat(buyResult.bonusQuantity()).isEqualTo(2);
-            assertThat(buyResult.pendingQuantity()).isEqualTo(2);
-            assertThat(buyResult.regularPriceQuantity()).isEqualTo(0);
+            assertThat(buyResults).hasSize(1)
+                    .extracting("buyType", "buyState", "promotionPriceQuantity", "bonusQuantity", "pendingQuantity",
+                            "regularPriceQuantity")
+                    .containsExactly(tuple(BuyType.PROMOTION, BuyState.PARTIALLY_PROMOTED, 4, 2, 2, 0));
         }
 
         @Test
@@ -85,19 +85,17 @@ class ConvenienceStoreTest {
                     new Product("콜라", 1000, 10, null)
             );
             ConvenienceStore convenienceStore = new ConvenienceStore(products, promotions);
-            OrderProduct orderProduct = new OrderProduct("콜라", 6);
+            List<OrderProduct> orderProducts = List.of(new OrderProduct("콜라", 6));
             LocalDate orderDate = LocalDate.parse("2024-11-01");
 
             // when
-            BuyResult buyResult = convenienceStore.buy(orderProduct, orderDate);
+            List<BuyResult> buyResults = convenienceStore.order(orderProducts, orderDate);
 
             // then
-            assertThat(buyResult.buyType()).isSameAs(BuyType.PROMOTION);
-            assertThat(buyResult.buyState()).isSameAs(BuyState.COMPLETE);
-            assertThat(buyResult.promotionPriceQuantity()).isEqualTo(4);
-            assertThat(buyResult.bonusQuantity()).isEqualTo(2);
-            assertThat(buyResult.pendingQuantity()).isEqualTo(0);
-            assertThat(buyResult.regularPriceQuantity()).isEqualTo(0);
+            assertThat(buyResults).hasSize(1)
+                    .extracting("buyType", "buyState", "promotionPriceQuantity", "bonusQuantity", "pendingQuantity",
+                            "regularPriceQuantity")
+                    .containsExactly(tuple(BuyType.PROMOTION, BuyState.COMPLETE, 4, 2, 0, 0));
         }
 
     }
@@ -118,19 +116,17 @@ class ConvenienceStoreTest {
                     new Product("콜라", 1000, 10, null)
             );
             ConvenienceStore convenienceStore = new ConvenienceStore(products, promotions);
-            OrderProduct orderProduct = new OrderProduct("콜라", 7);
+            List<OrderProduct> orderProducts = List.of(new OrderProduct("콜라", 7));
             LocalDate orderDate = LocalDate.parse("2024-11-01");
 
             // when
-            BuyResult buyResult = convenienceStore.buy(orderProduct, orderDate);
+            List<BuyResult> buyResults = convenienceStore.order(orderProducts, orderDate);
 
             // then
-            assertThat(buyResult.buyType()).isSameAs(BuyType.PROMOTION);
-            assertThat(buyResult.buyState()).isSameAs(BuyState.PARTIALLY_PROMOTED);
-            assertThat(buyResult.promotionPriceQuantity()).isEqualTo(4);
-            assertThat(buyResult.bonusQuantity()).isEqualTo(2);
-            assertThat(buyResult.pendingQuantity()).isEqualTo(1);
-            assertThat(buyResult.regularPriceQuantity()).isEqualTo(0);
+            assertThat(buyResults).hasSize(1)
+                    .extracting("buyType", "buyState", "promotionPriceQuantity", "bonusQuantity", "pendingQuantity",
+                            "regularPriceQuantity")
+                    .containsExactly(tuple(BuyType.PROMOTION, BuyState.PARTIALLY_PROMOTED, 4, 2, 1, 0));
         }
 
         @Test
@@ -145,19 +141,17 @@ class ConvenienceStoreTest {
                     new Product("콜라", 1000, 10, null)
             );
             ConvenienceStore convenienceStore = new ConvenienceStore(products, promotions);
-            OrderProduct orderProduct = new OrderProduct("콜라", 8);
+            List<OrderProduct> orderProducts = List.of(new OrderProduct("콜라", 8));
             LocalDate orderDate = LocalDate.parse("2024-11-01");
 
             // when
-            BuyResult buyResult = convenienceStore.buy(orderProduct, orderDate);
+            List<BuyResult> buyResults = convenienceStore.order(orderProducts, orderDate);
 
             // then
-            assertThat(buyResult.buyType()).isSameAs(BuyType.PROMOTION);
-            assertThat(buyResult.buyState()).isSameAs(BuyState.BONUS_ADDABLE);
-            assertThat(buyResult.promotionPriceQuantity()).isEqualTo(4);
-            assertThat(buyResult.bonusQuantity()).isEqualTo(2);
-            assertThat(buyResult.pendingQuantity()).isEqualTo(2);
-            assertThat(buyResult.regularPriceQuantity()).isEqualTo(0);
+            assertThat(buyResults).hasSize(1)
+                    .extracting("buyType", "buyState", "promotionPriceQuantity", "bonusQuantity", "pendingQuantity",
+                            "regularPriceQuantity")
+                    .containsExactly(tuple(BuyType.PROMOTION, BuyState.BONUS_ADDABLE, 4, 2, 2, 0));
         }
 
         @Test
@@ -172,19 +166,17 @@ class ConvenienceStoreTest {
                     new Product("콜라", 1000, 10, null)
             );
             ConvenienceStore convenienceStore = new ConvenienceStore(products, promotions);
-            OrderProduct orderProduct = new OrderProduct("콜라", 9);
+            List<OrderProduct> orderProducts = List.of(new OrderProduct("콜라", 9));
             LocalDate orderDate = LocalDate.parse("2024-11-01");
 
             // when
-            BuyResult buyResult = convenienceStore.buy(orderProduct, orderDate);
+            List<BuyResult> buyResults = convenienceStore.order(orderProducts, orderDate);
 
             // then
-            assertThat(buyResult.buyType()).isSameAs(BuyType.PROMOTION);
-            assertThat(buyResult.buyState()).isSameAs(BuyState.COMPLETE);
-            assertThat(buyResult.promotionPriceQuantity()).isEqualTo(6);
-            assertThat(buyResult.bonusQuantity()).isEqualTo(3);
-            assertThat(buyResult.pendingQuantity()).isEqualTo(0);
-            assertThat(buyResult.regularPriceQuantity()).isEqualTo(0);
+            assertThat(buyResults).hasSize(1)
+                    .extracting("buyType", "buyState", "promotionPriceQuantity", "bonusQuantity", "pendingQuantity",
+                            "regularPriceQuantity")
+                    .containsExactly(tuple(BuyType.PROMOTION, BuyState.COMPLETE, 6, 3, 0, 0));
         }
 
     }
@@ -200,19 +192,17 @@ class ConvenienceStoreTest {
                 new Product("콜라", 1000, 10, null)
         );
         ConvenienceStore convenienceStore = new ConvenienceStore(products, promotions);
-        OrderProduct orderProduct = new OrderProduct("콜라", 9);
+        List<OrderProduct> orderProducts = List.of(new OrderProduct("콜라", 9));
         LocalDate orderDate = LocalDate.parse("2024-11-01");
 
         // when
-        BuyResult buyResult = convenienceStore.buy(orderProduct, orderDate);
+        List<BuyResult> buyResults = convenienceStore.order(orderProducts, orderDate);
 
         // then
-        assertThat(buyResult.buyType()).isSameAs(BuyType.REGULAR);
-        assertThat(buyResult.buyState()).isSameAs(BuyState.COMPLETE);
-        assertThat(buyResult.promotionPriceQuantity()).isEqualTo(0);
-        assertThat(buyResult.bonusQuantity()).isEqualTo(0);
-        assertThat(buyResult.pendingQuantity()).isEqualTo(0);
-        assertThat(buyResult.regularPriceQuantity()).isEqualTo(9);
+        assertThat(buyResults).hasSize(1)
+                .extracting("buyType", "buyState", "promotionPriceQuantity", "bonusQuantity", "pendingQuantity",
+                        "regularPriceQuantity")
+                .containsExactly(tuple(BuyType.REGULAR, BuyState.COMPLETE, 0, 0, 0, 9));
     }
 
     @Test
@@ -227,19 +217,17 @@ class ConvenienceStoreTest {
                 new Product("콜라", 1000, 5, null)
         );
         ConvenienceStore convenienceStore = new ConvenienceStore(products, promotions);
-        OrderProduct orderProduct = new OrderProduct("콜라", 9);
+        List<OrderProduct> orderProducts = List.of(new OrderProduct("콜라", 9));
         LocalDate orderDate = LocalDate.parse("2024-12-01");
 
         // when
-        BuyResult buyResult = convenienceStore.buy(orderProduct, orderDate);
+        List<BuyResult> buyResults = convenienceStore.order(orderProducts, orderDate);
 
         // then
-        assertThat(buyResult.buyType()).isSameAs(BuyType.REGULAR);
-        assertThat(buyResult.buyState()).isSameAs(BuyState.COMPLETE);
-        assertThat(buyResult.promotionPriceQuantity()).isEqualTo(0);
-        assertThat(buyResult.bonusQuantity()).isEqualTo(0);
-        assertThat(buyResult.pendingQuantity()).isEqualTo(0);
-        assertThat(buyResult.regularPriceQuantity()).isEqualTo(9);
+        assertThat(buyResults).hasSize(1)
+                .extracting("buyType", "buyState", "promotionPriceQuantity", "bonusQuantity", "pendingQuantity",
+                        "regularPriceQuantity")
+                .containsExactly(tuple(BuyType.REGULAR, BuyState.COMPLETE, 0, 0, 0, 9));
     }
 
 }

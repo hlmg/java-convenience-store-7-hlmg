@@ -18,12 +18,8 @@ public class Promotion {
         this.endDate = endDate;
     }
 
-    public boolean nameEquals(String name) {
-        return this.name.equals(name);
-    }
-
-    public boolean isActiveOn(LocalDate date) {
-        return !(date.isBefore(startDate) || date.isAfter(endDate));
+    public boolean isDeActiveOn(LocalDate date) {
+        return date.isBefore(startDate) || date.isAfter(endDate);
     }
 
     public PromotionResult apply(int quantity) {
@@ -35,6 +31,10 @@ public class Promotion {
 
     public boolean isBonusApplicable(int quantity) {
         return buy == quantity;
+    }
+
+    public String getName() {
+        return name;
     }
 
 }

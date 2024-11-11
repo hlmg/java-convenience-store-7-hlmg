@@ -2,12 +2,13 @@ package store.controller;
 
 import camp.nextstep.edu.missionutils.DateTimes;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 import store.exception.StoreException;
+import store.input.ProductFileReader;
+import store.input.PromotionFileReader;
 import store.io.InputView;
 import store.io.OutputView;
 import store.model.BuyResult;
@@ -16,8 +17,6 @@ import store.model.ConvenienceStore;
 import store.model.OrderProduct;
 import store.model.Product;
 import store.model.Promotion;
-import store.input.ProductFileReader;
-import store.input.PromotionFileReader;
 import store.model.Receipt;
 import store.model.UserInputCommand;
 
@@ -34,13 +33,9 @@ public class StoreController {
 
         while (true) {
             outputView.printGreetingComment();
-            outputView.printProducts(convenienceStore.getProducts());
-            List<OrderProduct> orderProducts = handleRetryableException(this::getOrderProducts);
-            LocalDate orderDate = DateTimes.now().toLocalDate();
-            List<BuyResult> buyResults = new ArrayList<>();
-            for (OrderProduct orderProduct : orderProducts) {
-                buyResults.add(purchase(orderProduct, orderDate));
-            }
+            outputView.printSellingProducts(convenienceStore.getSellingProducts());
+            List<BuyResult> buyResults = handleRetryableException(this::order);
+            handleBuyResults(buyResults);
             Receipt receipt = new Receipt(buyResults);
             UserInputCommand membershipDecision = handleRetryableException(inputView::askMembershipDiscount);
             receipt.updateMembershipDecision(membershipDecision);
@@ -59,11 +54,11 @@ public class StoreController {
         convenienceStore = new ConvenienceStore(products, promotions);
     }
 
-    private List<OrderProduct> getOrderProducts() {
+    private List<BuyResult> order() {
         List<OrderProduct> orderProducts = inputView.getOrderProductsFromUser();
-        convenienceStore.validateOrderProducts(orderProducts);
         checkDuplicate(orderProducts);
-        return orderProducts;
+        LocalDate orderDate = DateTimes.now().toLocalDate();
+        return convenienceStore.order(orderProducts, orderDate);
     }
 
     // TODO: orderProducts 만들어서 검증 로직 넘기기
@@ -72,6 +67,7 @@ public class StoreController {
             throw new StoreException("잘못된 입력입니다.");
         }
     }
+
     private boolean isDuplicate(List<OrderProduct> orderProducts) {
         Set<String> distinctProductNames = new HashSet<>();
         return !orderProducts.stream()
@@ -79,22 +75,20 @@ public class StoreController {
                 .allMatch(distinctProductNames::add);
     }
 
-    private BuyResult purchase(OrderProduct orderProduct, LocalDate orderDate) {
-        BuyResult buyResult = convenienceStore.buy(orderProduct, orderDate);
-        if (buyResult.buyState() == BuyState.COMPLETE) {
-            return buyResult;
+    private void handleBuyResults(List<BuyResult> buyResults) {
+        for (BuyResult buyResult : buyResults) {
+            if (buyResult.buyState() == BuyState.BONUS_ADDABLE) {
+                UserInputCommand bonusAddDecision = handleRetryableException(
+                        () -> inputView.askAddBonus(buyResult.productName()));
+                buyResult.applyBonusDecision(bonusAddDecision);
+                continue;
+            }
+            if (buyResult.buyState() == BuyState.PARTIALLY_PROMOTED) {
+                UserInputCommand regularPricePaymentDecision = handleRetryableException(
+                        () -> inputView.askRegularPricePayment(buyResult.productName(), buyResult.pendingQuantity()));
+                buyResult.applyRegularPricePaymentDecision(regularPricePaymentDecision);
+            }
         }
-        if (buyResult.buyState() == BuyState.BONUS_ADDABLE) {
-            UserInputCommand bonusAddDecision = handleRetryableException(
-                    () -> inputView.askAddBonus(buyResult.productName()));
-            return buyResult.applyBonusDecision(bonusAddDecision);
-        }
-        if (buyResult.buyState() == BuyState.PARTIALLY_PROMOTED) {
-            UserInputCommand regularPricePaymentDecision = handleRetryableException(
-                    () -> inputView.askRegularPricePayment(buyResult.productName(), buyResult.pendingQuantity()));
-            return buyResult.applyRegularPricePaymentDecision(regularPricePaymentDecision);
-        }
-        throw new IllegalStateException("지원하지 않는 주문 상태입니다.");
     }
 
     private <T> T handleRetryableException(Supplier<T> supplier) {
