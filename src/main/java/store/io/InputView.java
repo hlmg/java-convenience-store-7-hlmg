@@ -16,9 +16,11 @@ public class InputView {
         System.out.println("구매하실 상품명과 수량을 입력해 주세요. (예: [사이다-2],[감자칩-1])");
         String userInput = Console.readLine();
         String[] splitOrderProducts = userInput.split(",");
-        return Arrays.stream(splitOrderProducts)
+        List<OrderProduct> orderProducts = Arrays.stream(splitOrderProducts)
                 .map(this::toOrderProduct)
                 .toList();
+        System.out.println();
+        return orderProducts;
     }
 
     public UserInputCommand askAddBonus(String productName) {
@@ -61,7 +63,9 @@ public class InputView {
 
     private UserInputCommand getUserInputCommand() {
         String userInput = Console.readLine();
-        return UserInputCommand.from(userInput);
+        UserInputCommand userInputCommand = UserInputCommand.from(userInput);
+        System.out.println();
+        return userInputCommand;
     }
 
 }
