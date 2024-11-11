@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import store.exception.StoreException;
 
 @SuppressWarnings("NonAsciiCharacters")
 class ConvenienceStoreTest {
@@ -18,12 +19,11 @@ class ConvenienceStoreTest {
         List<Product> products = List.of(new Product("콜라", 1000, 10, null));
         ConvenienceStore convenienceStore = new ConvenienceStore(products, List.of());
 
-        OrderProduct orderProduct = new OrderProduct("에너지바", 10);
-        LocalDate orderDate = LocalDate.parse("2024-11-01");
+        List<OrderProduct> orderProduct = List.of(new OrderProduct("에너지바", 10));
 
         // when & then
-        assertThatThrownBy(() -> convenienceStore.buy(orderProduct, orderDate))
-                .isInstanceOf(IllegalArgumentException.class)
+        assertThatThrownBy(() -> convenienceStore.validateOrderProducts(orderProduct))
+                .isInstanceOf(StoreException.class)
                 .hasMessage("존재하지 않는 상품입니다.");
     }
 
@@ -33,12 +33,12 @@ class ConvenienceStoreTest {
         List<Product> products = List.of(new Product("콜라", 1000, 10, null));
         ConvenienceStore convenienceStore = new ConvenienceStore(products, List.of());
 
-        OrderProduct orderProduct = new OrderProduct("콜라", 11);
+        List<OrderProduct> orderProduct = List.of(new OrderProduct("콜라", 11));
         LocalDate orderDate = LocalDate.parse("2024-11-01");
 
         // when & then
-        assertThatThrownBy(() -> convenienceStore.buy(orderProduct, orderDate))
-                .isInstanceOf(IllegalArgumentException.class)
+        assertThatThrownBy(() -> convenienceStore.validateOrderProducts(orderProduct))
+                .isInstanceOf(StoreException.class)
                 .hasMessage("재고 수량을 초과하여 구매할 수 없습니다.");
     }
 

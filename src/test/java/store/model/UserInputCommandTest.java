@@ -7,6 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import store.exception.StoreException;
 
 @SuppressWarnings("NonAsciiCharacters")
 class UserInputCommandTest {
@@ -30,7 +31,7 @@ class UserInputCommandTest {
     void 커맨드를_찾을_수_없으면_예외가_발생한다(String invalidSymbol) {
         // when & then
         assertThatThrownBy(() -> UserInputCommand.from(invalidSymbol))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(StoreException.class)
                 .hasMessage("잘못된 입력입니다.");
     }
 

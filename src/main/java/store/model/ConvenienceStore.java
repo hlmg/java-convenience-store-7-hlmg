@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import store.exception.StoreException;
 
 public class ConvenienceStore {
 
@@ -15,10 +16,38 @@ public class ConvenienceStore {
         this.promotions = promotions;
     }
 
+    public void validateOrderProducts(List<OrderProduct> orderProducts) {
+        checkProductExist(orderProducts);
+        checkEnoughStock(orderProducts);
+    }
+
+    private void checkProductExist(List<OrderProduct> orderProducts) {
+        for (OrderProduct orderProduct : orderProducts) {
+            List<Product> products = findProductsByName(orderProduct.name());
+            if (products.isEmpty()) {
+                throw new StoreException("존재하지 않는 상품입니다.");
+            }
+        }
+    }
+
+    private void checkEnoughStock(List<OrderProduct> orderProducts) {
+        for (OrderProduct orderProduct : orderProducts) {
+            int orderQuantity = orderProduct.quantity();
+            List<Product> products = findProductsByName(orderProduct.name());
+            if (getStock(products) < orderQuantity) {
+                throw new StoreException("재고 수량을 초과하여 구매할 수 없습니다.");
+            }
+        }
+    }
+
+    private int getStock(List<Product> products) {
+        return products.stream()
+                .mapToInt(Product::getQuantity)
+                .sum();
+    }
+
     public BuyResult buy(OrderProduct orderProduct, LocalDate orderDate) {
         List<Product> findProducts = findProductsByName(orderProduct.name());
-        checkProductExist(findProducts);
-        checkEnoughStock(findProducts, orderProduct.quantity());
         Optional<Promotion> activePromotion = getActivePromotion(findProducts, orderDate);
         if (activePromotion.isPresent()) {
             return proceedPromotionOrder(findProducts, orderProduct, activePromotion.get());
@@ -77,24 +106,6 @@ public class ConvenienceStore {
         return products.stream()
                 .filter(product -> product.nameEquals(name))
                 .toList();
-    }
-
-    private void checkProductExist(List<Product> products) {
-        if (products.isEmpty()) {
-            throw new IllegalArgumentException("존재하지 않는 상품입니다.");
-        }
-    }
-
-    private void checkEnoughStock(List<Product> products, int orderQuantity) {
-        if (getStock(products) < orderQuantity) {
-            throw new IllegalArgumentException("재고 수량을 초과하여 구매할 수 없습니다.");
-        }
-    }
-
-    private int getStock(List<Product> products) {
-        return products.stream()
-                .mapToInt(Product::getQuantity)
-                .sum();
     }
 
     private Optional<Promotion> getActivePromotion(List<Product> products, LocalDate orderDate) {

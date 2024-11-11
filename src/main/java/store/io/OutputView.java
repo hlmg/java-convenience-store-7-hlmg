@@ -1,6 +1,7 @@
 package store.io;
 
 import java.util.List;
+import store.exception.StoreException;
 import store.model.BuyResult;
 import store.model.Product;
 import store.model.Receipt;
@@ -35,6 +36,12 @@ public class OutputView {
         printEmptyLine();
     }
 
+    public void printStoreException(StoreException e) {
+        String message = String.format("[ERROR] %s 다시 입력해 주세요.", e.getMessage());
+        println(message);
+    }
+
+    // todo: method 순서 정리하기
     private void printBuyProducts(List<BuyResult> buyResults) {
         println(String.format("%-19s%-10s%-6s", "상품명", "수량", "금액"));
         for (BuyResult buyResult : buyResults) {

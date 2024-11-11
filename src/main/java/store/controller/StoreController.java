@@ -3,7 +3,11 @@ package store.controller;
 import camp.nextstep.edu.missionutils.DateTimes;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Supplier;
+import store.exception.StoreException;
 import store.io.InputView;
 import store.io.OutputView;
 import store.model.BuyResult;
@@ -28,22 +32,21 @@ public class StoreController {
     public void run() {
         init();
 
-        while(true) {
+        while (true) {
             outputView.printGreetingComment();
             outputView.printProducts(convenienceStore.getProducts());
-            List<OrderProduct> orderProducts = inputView.getOrderProductsFromUser();
+            List<OrderProduct> orderProducts = handleRetryableException(this::getOrderProducts);
             LocalDate orderDate = DateTimes.now().toLocalDate();
-            // TODO: 상품을 구매하기 전에, 존재하지 않는 상품인지, 재고 수량을 초과했는지, 중복 상품이 존재하는지 확인해야 함.
             List<BuyResult> buyResults = new ArrayList<>();
             for (OrderProduct orderProduct : orderProducts) {
                 buyResults.add(purchase(orderProduct, orderDate));
             }
             Receipt receipt = new Receipt(buyResults);
-            UserInputCommand membershipDecision = inputView.askMembershipDiscount();
+            UserInputCommand membershipDecision = handleRetryableException(inputView::askMembershipDiscount);
             receipt.updateMembershipDecision(membershipDecision);
             outputView.printReceipt(receipt);
             convenienceStore.deductProductsStock(receipt.getBuyResults());
-            UserInputCommand additionalPurchase = inputView.askAdditionalPurchase();
+            UserInputCommand additionalPurchase = handleRetryableException(inputView::askAdditionalPurchase);
             if (additionalPurchase == UserInputCommand.NO) {
                 break;
             }
@@ -56,21 +59,52 @@ public class StoreController {
         convenienceStore = new ConvenienceStore(products, promotions);
     }
 
+    private List<OrderProduct> getOrderProducts() {
+        List<OrderProduct> orderProducts = inputView.getOrderProductsFromUser();
+        convenienceStore.validateOrderProducts(orderProducts);
+        checkDuplicate(orderProducts);
+        return orderProducts;
+    }
+
+    // TODO: orderProducts 만들어서 검증 로직 넘기기
+    private void checkDuplicate(List<OrderProduct> orderProducts) {
+        if (isDuplicate(orderProducts)) {
+            throw new StoreException("잘못된 입력입니다.");
+        }
+    }
+    private boolean isDuplicate(List<OrderProduct> orderProducts) {
+        Set<String> distinctProductNames = new HashSet<>();
+        return !orderProducts.stream()
+                .map(OrderProduct::name)
+                .allMatch(distinctProductNames::add);
+    }
+
     private BuyResult purchase(OrderProduct orderProduct, LocalDate orderDate) {
         BuyResult buyResult = convenienceStore.buy(orderProduct, orderDate);
         if (buyResult.buyState() == BuyState.COMPLETE) {
             return buyResult;
         }
         if (buyResult.buyState() == BuyState.BONUS_ADDABLE) {
-            UserInputCommand bonusAddDecision = inputView.askAddBonus(buyResult.productName());
+            UserInputCommand bonusAddDecision = handleRetryableException(
+                    () -> inputView.askAddBonus(buyResult.productName()));
             return buyResult.applyBonusDecision(bonusAddDecision);
         }
         if (buyResult.buyState() == BuyState.PARTIALLY_PROMOTED) {
-            UserInputCommand regularPricePaymentDecision = inputView.askRegularPricePayment(buyResult.productName(),
-                    buyResult.pendingQuantity());
+            UserInputCommand regularPricePaymentDecision = handleRetryableException(
+                    () -> inputView.askRegularPricePayment(buyResult.productName(), buyResult.pendingQuantity()));
             return buyResult.applyRegularPricePaymentDecision(regularPricePaymentDecision);
         }
         throw new IllegalStateException("지원하지 않는 주문 상태입니다.");
+    }
+
+    private <T> T handleRetryableException(Supplier<T> supplier) {
+        while (true) {
+            try {
+                return supplier.get();
+            } catch (StoreException e) {
+                outputView.printStoreException(e);
+            }
+        }
     }
 
 }

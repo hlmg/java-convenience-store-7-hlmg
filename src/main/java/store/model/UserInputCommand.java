@@ -1,6 +1,7 @@
 package store.model;
 
 import java.util.Arrays;
+import store.exception.StoreException;
 
 public enum UserInputCommand {
 
@@ -18,7 +19,7 @@ public enum UserInputCommand {
         return Arrays.stream(UserInputCommand.values())
                 .filter(command -> command.symbol.equals(symbol))
                 .findAny()
-                .orElseThrow(() -> new IllegalArgumentException("잘못된 입력입니다."));
+                .orElseThrow(() -> new StoreException("잘못된 입력입니다."));
     }
 
 }
