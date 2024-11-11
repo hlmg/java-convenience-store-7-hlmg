@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 @SuppressWarnings("NonAsciiCharacters")
 class PromotionTest {
@@ -25,9 +27,24 @@ class PromotionTest {
         assertThat(promotionResult.getPendingQuantity()).isEqualTo(1);
     }
 
-    // TODO: 테스트 구현하기.
-    @Test
-    void 특정일에_프로모션이_진행중인지_확인할_수_있다() {
+    @CsvSource(textBlock = """
+            2024-10-31,true
+            2024-11-01,false
+            2024-11-30,false
+            2024-12-01,true
+            """)
+    @ParameterizedTest
+    void 특정일에_프로모션이_진행중이_아닌지_확인할_수_있다(String date, boolean expected) {
+        // given
+        LocalDate localDate = LocalDate.parse(date);
+        Promotion promotion = new Promotion("2+1", 2, 1,
+                LocalDate.parse("2024-11-01"), LocalDate.parse("2024-11-30"));
+
+        // when
+        boolean actual = promotion.isDeActiveOn(localDate);
+
+        // then
+        assertThat(actual).isEqualTo(expected);
     }
 
 }
