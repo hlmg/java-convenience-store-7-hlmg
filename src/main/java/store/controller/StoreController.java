@@ -11,14 +11,14 @@ import store.input.ProductFileReader;
 import store.input.PromotionFileReader;
 import store.io.InputView;
 import store.io.OutputView;
-import store.model.BuyResult;
-import store.model.BuyState;
+import store.model.order.BuyResult;
+import store.model.order.BuyState;
 import store.model.ConvenienceStore;
-import store.model.OrderProduct;
-import store.model.Product;
-import store.model.Promotion;
-import store.model.Receipt;
-import store.model.UserInputCommand;
+import store.model.order.OrderProduct;
+import store.model.product.Product;
+import store.model.promotion.Promotion;
+import store.model.order.Receipt;
+import store.model.user.UserInputCommand;
 
 public class StoreController {
 

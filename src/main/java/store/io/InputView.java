@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import store.exception.StoreException;
-import store.model.OrderProduct;
-import store.model.UserInputCommand;
+import store.model.order.OrderProduct;
+import store.model.user.UserInputCommand;
 
 public class InputView {
 

@@ -10,6 +10,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import store.exception.StoreException;
+import store.model.order.BuyResult;
+import store.model.order.BuyState;
+import store.model.order.BuyType;
+import store.model.order.OrderProduct;
+import store.model.product.Product;
+import store.model.promotion.Promotion;
 
 @SuppressWarnings("NonAsciiCharacters")
 class ConvenienceStoreTest {

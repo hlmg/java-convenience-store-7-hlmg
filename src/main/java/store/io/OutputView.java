@@ -2,9 +2,9 @@ package store.io;
 
 import java.util.List;
 import store.exception.StoreException;
-import store.model.BuyResult;
-import store.model.Receipt;
-import store.model.SellingProduct;
+import store.model.order.BuyResult;
+import store.model.order.Receipt;
+import store.model.product.SellingProduct;
 
 public class OutputView {
 

@@ -1,9 +1,10 @@
-package store.model;
+package store.model.discount;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import store.model.discount.MembershipDiscount;
 
 @SuppressWarnings("NonAsciiCharacters")
 class MembershipDiscountTest {

@@ -1,4 +1,4 @@
-package store.model;
+package store.model.user;
 
 import java.util.Arrays;
 import store.exception.StoreException;

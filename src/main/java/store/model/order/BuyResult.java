@@ -1,4 +1,6 @@
-package store.model;
+package store.model.order;
+
+import store.model.user.UserInputCommand;
 
 public record BuyResult(
         String productName,
@@ -13,7 +15,7 @@ public record BuyResult(
 
     public static BuyResult createPromotionCompleteResult(String productName, int price, int promotionPriceQuantity, int bonusQuantity,
                                                           int regularPriceQuantity) {
-        return new BuyResult(productName, price, store.model.BuyType.PROMOTION, BuyState.COMPLETE,
+        return new BuyResult(productName, price, BuyType.PROMOTION, BuyState.COMPLETE,
                 promotionPriceQuantity, bonusQuantity, 0, regularPriceQuantity);
     }
 

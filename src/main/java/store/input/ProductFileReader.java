@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
-import store.model.Product;
+import store.model.product.Product;
 
 public class ProductFileReader {
 

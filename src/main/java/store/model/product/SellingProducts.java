@@ -1,4 +1,4 @@
-package store.model;
+package store.model.product;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;

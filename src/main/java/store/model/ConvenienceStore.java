@@ -5,6 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import store.exception.StoreException;
+import store.model.order.BuyResult;
+import store.model.order.BuyType;
+import store.model.order.OrderOrganizer;
+import store.model.order.OrderProduct;
+import store.model.product.Product;
+import store.model.product.SellingProduct;
+import store.model.product.SellingProducts;
+import store.model.promotion.Promotion;
+import store.model.promotion.PromotionResult;
+import store.model.promotion.Promotions;
 
 public class ConvenienceStore {
 

@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
-import store.model.Promotion;
+import store.model.promotion.Promotion;
 
 public class PromotionFileReader {
 

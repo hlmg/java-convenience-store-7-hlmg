@@ -1,4 +1,6 @@
-package store.model;
+package store.model.product;
+
+import store.model.order.BuyType;
 
 public class SellingProduct {
 
