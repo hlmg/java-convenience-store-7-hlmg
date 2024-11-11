@@ -1,5 +1,6 @@
 package store.model;
 
+import java.util.Collections;
 import java.util.List;
 
 public class Receipt {
@@ -24,6 +25,12 @@ public class Receipt {
                 .sum();
     }
 
+    public int getTotalBuyQuantity() {
+        return buyResults.stream()
+                .mapToInt(BuyResult::getTotalBuyQuantity)
+                .sum();
+    }
+
     public int getPromotionDiscountPrice() {
         return buyResults.stream()
                 .mapToInt(BuyResult::getPromotionDiscountPrice)
@@ -42,6 +49,10 @@ public class Receipt {
 
     public int getPaymentPrice() {
         return getTotalBuyPrice() - getPromotionDiscountPrice() - getMembershipDiscountPrice();
+    }
+
+    public List<BuyResult> getBuyResults() {
+        return Collections.unmodifiableList(buyResults);
     }
 
 }

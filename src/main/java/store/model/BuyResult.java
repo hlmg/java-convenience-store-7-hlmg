@@ -63,6 +63,10 @@ public record BuyResult(
         throw new IllegalStateException("지원하지 않는 명령입니다.");
     }
 
+    public boolean hasBonus() {
+        return bonusQuantity > 0;
+    }
+
     public int getTotalBuyPrice() {
         return price * getTotalBuyQuantity();
     }

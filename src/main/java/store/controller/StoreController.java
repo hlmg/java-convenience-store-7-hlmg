@@ -39,6 +39,7 @@ public class StoreController {
         Receipt receipt = new Receipt(buyResults);
         UserInputCommand membershipDecision = inputView.askMembershipDiscount();
         receipt.updateMembershipDecision(membershipDecision);
+        outputView.printReceipt(receipt);
     }
 
     private void init() {
