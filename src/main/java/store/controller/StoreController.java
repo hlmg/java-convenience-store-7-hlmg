@@ -52,7 +52,7 @@ public class StoreController {
 
     private void showStoreInformation() {
         outputView.printGreetingComment();
-        outputView.printSellingProducts(convenienceStore.getSellingProducts());
+        outputView.printSellingProducts(convenienceStore.getSellingProductSnapshots());
     }
 
     private List<BuyResult> buyProducts() {

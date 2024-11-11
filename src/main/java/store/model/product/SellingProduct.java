@@ -93,7 +93,7 @@ public class SellingProduct {
     }
 
     public SellingProductSnapshot getSnapShot() {
-        return new SellingProductSnapshot(name, price);
+        return new SellingProductSnapshot(name, price, regularStock, promotionStock, promotion);
     }
 
 }

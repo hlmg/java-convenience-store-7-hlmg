@@ -86,7 +86,7 @@ class ReceiptTest {
     private BuyResult createPromotionResult(String name, int price, int promotionQuantity, int bonusQuantity,
                                             int regularPriceQuantity) {
         return new BuyResult(
-                new SellingProductSnapshot(name, price),
+                new SellingProductSnapshot(name, price, 10, 10, "2+1"),
                 new PromotionResult(promotionQuantity, bonusQuantity, 0, PromotionState.FULL_PROMOTED),
                 regularPriceQuantity
         );
@@ -94,7 +94,7 @@ class ReceiptTest {
 
     private BuyResult createRegularResult(String name, int price, int regularPriceQuantity) {
         return new BuyResult(
-                new SellingProductSnapshot(name, price),
+                new SellingProductSnapshot(name, price, 10, 10, "2+1"),
                 null,
                 regularPriceQuantity
         );

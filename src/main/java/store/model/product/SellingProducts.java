@@ -28,8 +28,9 @@ public class SellingProducts {
         return sellingProduct;
     }
 
-    public List<SellingProduct> getProducts() {
+    public List<SellingProductSnapshot> getSellingProductSnapshots() {
         return sellingProducts.values().stream()
+                .map(SellingProduct::getSnapShot)
                 .toList();
     }
 

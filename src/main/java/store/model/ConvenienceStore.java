@@ -10,6 +10,7 @@ import store.model.order.OrderOrganizer;
 import store.model.order.OrderProduct;
 import store.model.product.Product;
 import store.model.product.SellingProduct;
+import store.model.product.SellingProductSnapshot;
 import store.model.product.SellingProducts;
 import store.model.promotion.Promotion;
 import store.model.promotion.PromotionResult;
@@ -26,8 +27,8 @@ public class ConvenienceStore {
         this.promotions = new Promotions(promotions);
     }
 
-    public List<SellingProduct> getSellingProducts() {
-        return sellingProducts.getProducts();
+    public List<SellingProductSnapshot> getSellingProductSnapshots() {
+        return sellingProducts.getSellingProductSnapshots();
     }
 
     public List<BuyResult> buyProducts(List<OrderProduct> orderProducts, LocalDate orderDate) {

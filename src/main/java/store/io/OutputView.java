@@ -4,7 +4,7 @@ import java.util.List;
 import store.exception.StoreException;
 import store.model.order.BuyResult;
 import store.model.order.Receipt;
-import store.model.product.SellingProduct;
+import store.model.product.SellingProductSnapshot;
 
 public class OutputView {
 
@@ -12,10 +12,10 @@ public class OutputView {
         println("안녕하세요. W편의점입니다.");
     }
 
-    public void printSellingProducts(List<SellingProduct> products) {
+    public void printSellingProducts(List<SellingProductSnapshot> productSnapshots) {
         println("현재 보유하고 있는 상품입니다.");
         printEmptyLine();
-        products.forEach(this::printProduct);
+        productSnapshots.forEach(this::printProduct);
         printEmptyLine();
     }
 
@@ -90,23 +90,23 @@ public class OutputView {
         return quantity + "개";
     }
 
-    private void printProduct(SellingProduct product) {
-        if (product.hasPromotion()) {
-            printPromotionProduct(product);
+    private void printProduct(SellingProductSnapshot productSnapshots) {
+        if (productSnapshots.hasPromotion()) {
+            printPromotionProduct(productSnapshots);
         }
-        printRegularProduct(product);
+        printRegularProduct(productSnapshots);
     }
 
-    private void printPromotionProduct(SellingProduct product) {
-        String stockMessage = getStockMessage(product.getPromotionStock());
-        String productMessage = String.format("- %s %,d원 %s %s", product.getName(), product.getPrice(), stockMessage,
-                product.getPromotion());
+    private void printPromotionProduct(SellingProductSnapshot product) {
+        String stockMessage = getStockMessage(product.promotionStock());
+        String productMessage = String.format("- %s %,d원 %s %s", product.name(), product.price(), stockMessage,
+                product.promotion());
         println(productMessage);
     }
 
-    private void printRegularProduct(SellingProduct product) {
-        String stockMessage = getStockMessage(product.getRegularStock());
-        String productMessage = String.format("- %s %,d원 %s", product.getName(), product.getPrice(), stockMessage);
+    private void printRegularProduct(SellingProductSnapshot product) {
+        String stockMessage = getStockMessage(product.regularStock());
+        String productMessage = String.format("- %s %,d원 %s", product.name(), product.price(), stockMessage);
         println(productMessage);
     }
 
