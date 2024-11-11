@@ -5,8 +5,6 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import store.model.order.OrderOrganizer;
-import store.model.order.OrderProduct;
 
 @SuppressWarnings("NonAsciiCharacters")
 class OrderOrganizerTest {

@@ -27,14 +27,13 @@ public class SellingProduct {
                 product.getPromotion());
     }
 
-    public SellingProduct update(Product product) {
+    public void update(Product product) {
         if (product.hasPromotion()) {
             this.promotionStock = product.getQuantity();
             this.promotion = product.getPromotion();
-            return this;
+            return;
         }
         this.regularStock = product.getQuantity();
-        return this;
     }
 
     public boolean ifPromotionStockLessThanOrEquals(int quantity) {

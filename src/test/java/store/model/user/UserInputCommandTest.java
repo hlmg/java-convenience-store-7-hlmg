@@ -8,7 +8,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import store.exception.StoreException;
-import store.model.user.UserInputCommand;
 
 @SuppressWarnings("NonAsciiCharacters")
 class UserInputCommandTest {

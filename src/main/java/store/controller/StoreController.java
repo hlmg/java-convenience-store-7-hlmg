@@ -2,22 +2,20 @@ package store.controller;
 
 import camp.nextstep.edu.missionutils.DateTimes;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Supplier;
 import store.exception.StoreException;
 import store.input.ProductFileReader;
 import store.input.PromotionFileReader;
 import store.io.InputView;
 import store.io.OutputView;
+import store.model.ConvenienceStore;
 import store.model.order.BuyResult;
 import store.model.order.BuyState;
-import store.model.ConvenienceStore;
 import store.model.order.OrderProduct;
+import store.model.order.Receipt;
 import store.model.product.Product;
 import store.model.promotion.Promotion;
-import store.model.order.Receipt;
 import store.model.user.UserInputCommand;
 
 public class StoreController {
@@ -56,23 +54,8 @@ public class StoreController {
 
     private List<BuyResult> order() {
         List<OrderProduct> orderProducts = inputView.getOrderProductsFromUser();
-        checkDuplicate(orderProducts);
         LocalDate orderDate = DateTimes.now().toLocalDate();
         return convenienceStore.order(orderProducts, orderDate);
-    }
-
-    // TODO: orderProducts 만들어서 검증 로직 넘기기
-    private void checkDuplicate(List<OrderProduct> orderProducts) {
-        if (isDuplicate(orderProducts)) {
-            throw new StoreException("잘못된 입력입니다.");
-        }
-    }
-
-    private boolean isDuplicate(List<OrderProduct> orderProducts) {
-        Set<String> distinctProductNames = new HashSet<>();
-        return !orderProducts.stream()
-                .map(OrderProduct::name)
-                .allMatch(distinctProductNames::add);
     }
 
     private void handleBuyResults(List<BuyResult> buyResults) {

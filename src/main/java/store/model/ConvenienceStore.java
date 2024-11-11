@@ -61,14 +61,16 @@ public class ConvenienceStore {
         }
     }
 
-    private BuyResult proceedPromotionOrder(SellingProduct sellingProduct, OrderProduct orderProduct, Promotion promotion) {
+    private BuyResult proceedPromotionOrder(SellingProduct sellingProduct, OrderProduct orderProduct,
+                                            Promotion promotion) {
         if (sellingProduct.ifPromotionStockLessThanOrEquals(orderProduct.quantity())) {
             return proceedLowStockPromotion(sellingProduct, orderProduct, promotion);
         }
         return proceedFullStockPromotion(sellingProduct, orderProduct, promotion);
     }
 
-    private BuyResult proceedLowStockPromotion(SellingProduct sellingProduct, OrderProduct orderProduct, Promotion promotion) {
+    private BuyResult proceedLowStockPromotion(SellingProduct sellingProduct, OrderProduct orderProduct,
+                                               Promotion promotion) {
         int promotionStock = sellingProduct.getPromotionStock();
         PromotionResult promotionResult = promotion.apply(promotionStock);
 
@@ -79,7 +81,8 @@ public class ConvenienceStore {
                 pendingQuantity);
     }
 
-    private BuyResult proceedFullStockPromotion(SellingProduct sellingProduct, OrderProduct orderProduct, Promotion promotion) {
+    private BuyResult proceedFullStockPromotion(SellingProduct sellingProduct, OrderProduct orderProduct,
+                                                Promotion promotion) {
         PromotionResult promotionResult = promotion.apply(orderProduct.quantity());
         int pendingQuantity = promotionResult.remain();
         int price = sellingProduct.getPrice();

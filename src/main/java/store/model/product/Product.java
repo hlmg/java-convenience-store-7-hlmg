@@ -14,10 +14,6 @@ public final class Product {
         this.promotion = promotion;
     }
 
-    public boolean nameEquals(String name) {
-        return this.name.equals(name);
-    }
-
     public boolean hasPromotion() {
         return promotion != null;
     }
@@ -36,16 +32,6 @@ public final class Product {
 
     public String getPromotion() {
         return promotion;
-    }
-
-    public int deductStock(int quantity) {
-        if (this.quantity >= quantity) {
-            this.quantity -= quantity;
-            return 0;
-        }
-        int remain = quantity - this.quantity;
-        this.quantity = 0;
-        return remain;
     }
 
 }

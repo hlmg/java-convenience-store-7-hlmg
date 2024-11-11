@@ -7,9 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import store.model.order.BuyResult;
-import store.model.order.BuyState;
-import store.model.order.BuyType;
 import store.model.user.UserInputCommand;
 
 @SuppressWarnings("NonAsciiCharacters")

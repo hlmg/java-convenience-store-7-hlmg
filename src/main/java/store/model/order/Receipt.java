@@ -2,8 +2,8 @@ package store.model.order;
 
 import java.util.Collections;
 import java.util.List;
-import store.model.user.UserInputCommand;
 import store.model.discount.MembershipDiscount;
+import store.model.user.UserInputCommand;
 
 public class Receipt {
 

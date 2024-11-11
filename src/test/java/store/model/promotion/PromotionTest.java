@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
-import store.model.promotion.Promotion;
-import store.model.promotion.PromotionResult;
 
 @SuppressWarnings("NonAsciiCharacters")
 class PromotionTest {

@@ -13,13 +13,15 @@ public record BuyResult(
         int regularPriceQuantity
 ) {
 
-    public static BuyResult createPromotionCompleteResult(String productName, int price, int promotionPriceQuantity, int bonusQuantity,
+    public static BuyResult createPromotionCompleteResult(String productName, int price, int promotionPriceQuantity,
+                                                          int bonusQuantity,
                                                           int regularPriceQuantity) {
         return new BuyResult(productName, price, BuyType.PROMOTION, BuyState.COMPLETE,
                 promotionPriceQuantity, bonusQuantity, 0, regularPriceQuantity);
     }
 
-    public static BuyResult createPartiallyPromotedResult(String productName, int price, int promotionPriceQuantity, int bonusQuantity,
+    public static BuyResult createPartiallyPromotedResult(String productName, int price, int promotionPriceQuantity,
+                                                          int bonusQuantity,
                                                           int pendingQuantity) {
         if (pendingQuantity == 0) {
             return createPromotionCompleteResult(productName, price, promotionPriceQuantity, bonusQuantity, 0);
@@ -28,7 +30,8 @@ public record BuyResult(
                 promotionPriceQuantity, bonusQuantity, pendingQuantity, 0);
     }
 
-    public static BuyResult createBonusAddableResult(String productName, int price, int promotionPriceQuantity, int bonusQuantity,
+    public static BuyResult createBonusAddableResult(String productName, int price, int promotionPriceQuantity,
+                                                     int bonusQuantity,
                                                      int pendingQuantity) {
         return new BuyResult(productName, price, BuyType.PROMOTION, BuyState.BONUS_ADDABLE,
                 promotionPriceQuantity, bonusQuantity, pendingQuantity, 0);
@@ -48,7 +51,8 @@ public record BuyResult(
             return createPromotionCompleteResult(productName, price, promotionPriceQuantity, bonusQuantity, 0);
         }
         if (bonusDecision == UserInputCommand.NO) {
-            return createPromotionCompleteResult(productName, price, promotionPriceQuantity, bonusQuantity, pendingQuantity);
+            return createPromotionCompleteResult(productName, price, promotionPriceQuantity, bonusQuantity,
+                    pendingQuantity);
         }
         throw new IllegalStateException("지원하지 않는 명령입니다.");
     }
@@ -57,7 +61,8 @@ public record BuyResult(
         checkRegularPricePaymentType();
         checkRegularPricePaymentState();
         if (regularPricePaymentDecision == UserInputCommand.YES) {
-            return createPromotionCompleteResult(productName, price, promotionPriceQuantity, bonusQuantity, pendingQuantity);
+            return createPromotionCompleteResult(productName, price, promotionPriceQuantity, bonusQuantity,
+                    pendingQuantity);
         }
         if (regularPricePaymentDecision == UserInputCommand.NO) {
             return createPromotionCompleteResult(productName, price, promotionPriceQuantity, bonusQuantity, 0);
