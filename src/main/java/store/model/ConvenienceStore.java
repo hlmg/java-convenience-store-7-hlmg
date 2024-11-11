@@ -8,6 +8,7 @@ import store.exception.StoreException;
 
 public class ConvenienceStore {
 
+    private final OrderOrganizer orderOrganizer = new OrderOrganizer();
     private final SellingProducts sellingProducts;
     private final Promotions promotions;
 
@@ -21,6 +22,7 @@ public class ConvenienceStore {
     }
 
     public List<BuyResult> order(List<OrderProduct> orderProducts, LocalDate orderDate) {
+        orderProducts = orderOrganizer.organizeOrderProducts(orderProducts);
         List<BuyResult> buyResults = new ArrayList<>();
         for (OrderProduct orderProduct : orderProducts) {
             buyResults.add(buy(orderProduct, orderDate));
