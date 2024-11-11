@@ -1,6 +1,5 @@
 package store.model.product;
 
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,9 +29,8 @@ public class SellingProducts {
     }
 
     public List<SellingProduct> getProducts() {
-        Collection<SellingProduct> values = sellingProducts.values();
-
-        return sellingProducts.values().stream().toList();
+        return sellingProducts.values().stream()
+                .toList();
     }
 
 }
