@@ -19,26 +19,6 @@ public class OutputView {
         printEmptyLine();
     }
 
-    private void printProduct(SellingProduct product) {
-        if (product.hasPromotion()) {
-            printPromotionProduct(product);
-        }
-        printRegularProduct(product);
-    }
-
-    private void printPromotionProduct(SellingProduct product) {
-        String stockMessage = getStockMessage(product.getPromotionStock());
-        String productMessage = String.format("- %s %,d원 %s %s", product.getName(), product.getPrice(), stockMessage,
-                product.getPromotion());
-        println(productMessage);
-    }
-
-    private void printRegularProduct(SellingProduct product) {
-        String stockMessage = getStockMessage(product.getRegularStock());
-        String productMessage = String.format("- %s %,d원 %s", product.getName(), product.getPrice(), stockMessage);
-        println(productMessage);
-    }
-
     public void printReceipt(Receipt receipt) {
         println("==============W 편의점================");
         printBuyProducts(receipt.getBuyResults());
@@ -52,7 +32,6 @@ public class OutputView {
         println(message);
     }
 
-    // todo: method 순서 정리하기
     private void printBuyProducts(List<BuyResult> buyResults) {
         println(String.format("%-19s%-10s%-6s", "상품명", "수량", "금액"));
         for (BuyResult buyResult : buyResults) {
@@ -109,6 +88,26 @@ public class OutputView {
             return "재고 없음";
         }
         return quantity + "개";
+    }
+
+    private void printProduct(SellingProduct product) {
+        if (product.hasPromotion()) {
+            printPromotionProduct(product);
+        }
+        printRegularProduct(product);
+    }
+
+    private void printPromotionProduct(SellingProduct product) {
+        String stockMessage = getStockMessage(product.getPromotionStock());
+        String productMessage = String.format("- %s %,d원 %s %s", product.getName(), product.getPrice(), stockMessage,
+                product.getPromotion());
+        println(productMessage);
+    }
+
+    private void printRegularProduct(SellingProduct product) {
+        String stockMessage = getStockMessage(product.getRegularStock());
+        String productMessage = String.format("- %s %,d원 %s", product.getName(), product.getPrice(), stockMessage);
+        println(productMessage);
     }
 
     private void println(String message) {
