@@ -1,128 +1,126 @@
 package store.model.order;
 
+import store.model.product.SellingProductSnapshot;
+import store.model.promotion.PromotionResult;
 import store.model.user.UserInputCommand;
 
 public final class BuyResult {
 
-    private final String productName;
-    private final int price;
-    private final BuyType buyType;
-    private BuyState buyState;
-    private int promotionPriceQuantity;
-    private int bonusQuantity;
-    private int pendingQuantity;
+    private final SellingProductSnapshot sellingProduct;
+    private final PromotionResult promotionResult;
     private int regularPriceQuantity;
 
-    public BuyResult(String productName, int price, BuyType buyType, BuyState buyState, int promotionPriceQuantity,
-                     int bonusQuantity, int pendingQuantity, int regularPriceQuantity) {
-        this.productName = productName;
-        this.price = price;
-        this.buyType = buyType;
-        this.buyState = buyState;
-        this.promotionPriceQuantity = promotionPriceQuantity;
-        this.bonusQuantity = bonusQuantity;
-        this.pendingQuantity = pendingQuantity;
+    public BuyResult(SellingProductSnapshot sellingProduct, PromotionResult promotionResult, int regularPriceQuantity) {
+        this.sellingProduct = sellingProduct;
+        this.promotionResult = promotionResult;
         this.regularPriceQuantity = regularPriceQuantity;
     }
 
-    public static BuyResult createPromotionCompleteResult(String productName, int price, int promotionPriceQuantity,
-                                                          int bonusQuantity, int regularPriceQuantity) {
-        return new BuyResult(productName, price, BuyType.PROMOTION, BuyState.COMPLETE,
-                promotionPriceQuantity, bonusQuantity, 0, regularPriceQuantity);
+    public static BuyResult createPromotionResult(SellingProductSnapshot sellingProduct, PromotionResult promotionResult) {
+        return new BuyResult(sellingProduct, promotionResult, 0);
     }
 
-    public static BuyResult createPartiallyPromotedResult(String productName, int price, int promotionPriceQuantity,
-                                                          int bonusQuantity, int pendingQuantity) {
-        if (pendingQuantity == 0) {
-            return createPromotionCompleteResult(productName, price, promotionPriceQuantity, bonusQuantity, 0);
-        }
-        return new BuyResult(productName, price, BuyType.PROMOTION, BuyState.PARTIALLY_PROMOTED,
-                promotionPriceQuantity, bonusQuantity, pendingQuantity, 0);
+    public static BuyResult createRegularOrder(SellingProductSnapshot sellingProduct, int quantity) {
+        return new BuyResult(sellingProduct, null, quantity);
     }
 
-    public static BuyResult createBonusAddableResult(String productName, int price, int promotionPriceQuantity,
-                                                     int bonusQuantity, int pendingQuantity) {
-        return new BuyResult(productName, price, BuyType.PROMOTION, BuyState.BONUS_ADDABLE,
-                promotionPriceQuantity, bonusQuantity, pendingQuantity, 0);
+    public boolean isPendingState() {
+        return isPromotionOrder() && promotionResult.isPending();
     }
 
-    public static BuyResult createRegularCompleteResult(String productName, int price, int regularPriceQuantity) {
-        return new BuyResult(productName, price, BuyType.REGULAR, BuyState.COMPLETE,
-                0, 0, 0, regularPriceQuantity);
+    public boolean isPromotionOrder() {
+        return promotionResult != null;
     }
 
     public void resolvePendingState(UserInputCommand userInputCommand) {
-        if (buyState == BuyState.BONUS_ADDABLE) {
+        if (!isPendingState()) {
+            return;
+        }
+        if (promotionResult.isBonusAddable()) {
             applyBonusDecision(userInputCommand);
             return;
         }
-        if (buyState == BuyState.PARTIALLY_PROMOTED) {
+        if (promotionResult.isPartiallyPromoted()) {
             applyRegularPricePaymentDecision(userInputCommand);
         }
     }
 
     private void applyBonusDecision(UserInputCommand bonusDecision) {
         if (bonusDecision == UserInputCommand.YES) {
-            promotionPriceQuantity += pendingQuantity;
-            bonusQuantity++;
+            promotionResult.addBonus();
         }
         if (bonusDecision == UserInputCommand.NO) {
-            regularPriceQuantity = pendingQuantity;
+            regularPriceQuantity = promotionResult.getPendingQuantity();
         }
-        buyState = BuyState.COMPLETE;
-        pendingQuantity = 0;
+        promotionResult.changeToFullPromotedState();
     }
 
     private void applyRegularPricePaymentDecision(UserInputCommand regularPricePaymentDecision) {
         if (regularPricePaymentDecision == UserInputCommand.YES) {
-            regularPriceQuantity = pendingQuantity;
+            regularPriceQuantity = promotionResult.getPendingQuantity();;
         }
-        buyState = BuyState.COMPLETE;
-        pendingQuantity = 0;
+        promotionResult.changeToFullPromotedState();
     }
 
     public boolean hasBonus() {
-        return bonusQuantity > 0;
+        if (!isPromotionOrder()) {
+            return false;
+        }
+        return promotionResult.hasBonus();
     }
 
     public int getTotalBuyPrice() {
-        return price * getTotalBuyQuantity();
+        return sellingProduct.price() * getTotalBuyQuantity();
     }
 
     public int getPromotionDiscountPrice() {
-        return price * bonusQuantity;
+        if (!isPromotionOrder()) {
+            return 0;
+        }
+        return sellingProduct.price() * promotionResult.getBonusQuantity();
     }
 
     public int getRegularBuyPrice() {
-        return price * regularPriceQuantity;
+        return sellingProduct.price() * regularPriceQuantity;
     }
 
     public int getTotalBuyQuantity() {
-        return promotionPriceQuantity + bonusQuantity + regularPriceQuantity;
+        if (!isPromotionOrder()) {
+            return regularPriceQuantity;
+        }
+        return promotionResult.getPromotionPriceQuantity() + promotionResult.getBonusQuantity() + regularPriceQuantity;
     }
 
     public int getPendingQuantity() {
-        return pendingQuantity;
+        return promotionResult.getPendingQuantity();
     }
 
     public boolean isBonusAddable() {
-        return buyState == BuyState.BONUS_ADDABLE;
+        return promotionResult.getPromotionState() == PromotionState.BONUS_ADDABLE;
     }
 
     public boolean isComplete() {
-        return buyState == BuyState.COMPLETE;
+        return !isPromotionOrder() || promotionResult.getPromotionState() == PromotionState.FULL_PROMOTED;
+    }
+
+    public boolean isPartiallyPromoted() {
+        return promotionResult.isPartiallyPromoted();
     }
 
     public String getProductName() {
-        return productName;
+        return sellingProduct.name();
     }
 
+    // TODO: BuyType 제거하기
     public BuyType getBuyType() {
-        return buyType;
+        if (isPromotionOrder()) {
+            return BuyType.PROMOTION;
+        }
+        return BuyType.REGULAR;
     }
 
     public int getBonusQuantity() {
-        return bonusQuantity;
+        return promotionResult.getBonusQuantity();
     }
 
 }

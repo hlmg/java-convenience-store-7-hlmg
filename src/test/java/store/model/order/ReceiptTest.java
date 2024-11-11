@@ -6,6 +6,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import store.model.product.SellingProductSnapshot;
+import store.model.promotion.PromotionResult;
 import store.model.user.UserInputCommand;
 
 @SuppressWarnings("NonAsciiCharacters")
@@ -15,10 +17,8 @@ class ReceiptTest {
     void 총구매액을_계산할_수_있다() {
         // given
         List<BuyResult> buyResults = List.of(
-                new BuyResult("콜라", 1000, BuyType.PROMOTION, BuyState.COMPLETE,
-                        2, 1, 0, 4),
-                new BuyResult("에너지바", 2000, BuyType.REGULAR, BuyState.COMPLETE,
-                        0, 0, 0, 2)
+                createPromotionResult("콜라", 1000, 2, 1, 4),
+                createRegularResult("에너지바", 2000, 2)
         );
         Receipt receipt = new Receipt(buyResults, UserInputCommand.NO);
 
@@ -33,10 +33,8 @@ class ReceiptTest {
     void 행사할인액을_계산할_수_있다() {
         // given
         List<BuyResult> buyResults = List.of(
-                new BuyResult("콜라", 1000, BuyType.PROMOTION, BuyState.COMPLETE,
-                        2, 1, 0, 4),
-                new BuyResult("에너지바", 2000, BuyType.REGULAR, BuyState.COMPLETE,
-                        0, 0, 0, 2)
+                createPromotionResult("콜라", 1000, 2, 1, 4),
+                createRegularResult("에너지바", 2000, 2)
         );
         Receipt receipt = new Receipt(buyResults, UserInputCommand.NO);
 
@@ -55,11 +53,10 @@ class ReceiptTest {
     void 멤버십할인액을_계산할_수_있다(UserInputCommand membershipDecision, int expected) {
         // given
         List<BuyResult> buyResults = List.of(
-                new BuyResult("콜라", 1000, BuyType.PROMOTION, BuyState.COMPLETE,
-                        2, 1, 0, 4),
-                new BuyResult("에너지바", 2000, BuyType.REGULAR, BuyState.COMPLETE,
-                        0, 0, 0, 2)
+                createPromotionResult("콜라", 1000, 2, 1, 4),
+                createRegularResult("에너지바", 2000, 2)
         );
+
         Receipt receipt = new Receipt(buyResults, membershipDecision);
 
         // when
@@ -73,11 +70,10 @@ class ReceiptTest {
     void 결제_금액을_계산할_수_있다() {
         // given
         List<BuyResult> buyResults = List.of(
-                new BuyResult("콜라", 1000, BuyType.PROMOTION, BuyState.COMPLETE,
-                        2, 1, 0, 4),
-                new BuyResult("에너지바", 2000, BuyType.REGULAR, BuyState.COMPLETE,
-                        0, 0, 0, 2)
+                createPromotionResult("콜라", 1000, 2, 1, 4),
+                createRegularResult("에너지바", 2000, 2)
         );
+
         Receipt receipt = new Receipt(buyResults, UserInputCommand.YES);
 
         // when
@@ -85,6 +81,23 @@ class ReceiptTest {
 
         // then
         assertThat(paymentPrice).isEqualTo(7600);
+    }
+
+    private BuyResult createPromotionResult(String name, int price, int promotionQuantity, int bonusQuantity,
+                                            int regularPriceQuantity) {
+        return new BuyResult(
+                new SellingProductSnapshot(name, price),
+                new PromotionResult(promotionQuantity, bonusQuantity, 0, PromotionState.FULL_PROMOTED),
+                regularPriceQuantity
+        );
+    }
+
+    private BuyResult createRegularResult(String name, int price, int regularPriceQuantity) {
+        return new BuyResult(
+                new SellingProductSnapshot(name, price),
+                null,
+                regularPriceQuantity
+        );
     }
 
 }

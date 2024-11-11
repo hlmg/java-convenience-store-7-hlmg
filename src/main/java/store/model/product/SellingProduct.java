@@ -36,10 +36,6 @@ public class SellingProduct {
         this.regularStock = product.getQuantity();
     }
 
-    public boolean ifPromotionStockLessThanOrEquals(int quantity) {
-        return promotionStock <= quantity;
-    }
-
     public String getName() {
         return name;
     }
@@ -94,6 +90,10 @@ public class SellingProduct {
         int remain = totalBuyQuantity - promotionStock;
         promotionStock = 0;
         regularStock -= remain;
+    }
+
+    public SellingProductSnapshot getSnapShot() {
+        return new SellingProductSnapshot(name, price);
     }
 
 }

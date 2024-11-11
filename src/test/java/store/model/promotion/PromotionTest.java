@@ -13,15 +13,16 @@ class PromotionTest {
         // given
         Promotion promotion = new Promotion("2+1", 2, 1,
                 LocalDate.parse("2024-11-01"), LocalDate.parse("2024-11-30"));
-        int quantity = 10;
+        int promotionStock = 20;
+        int orderQuantity = 10;
 
         // when
-        PromotionResult promotionResult = promotion.apply(quantity);
+        PromotionResult promotionResult = promotion.apply(promotionStock, orderQuantity);
 
         // then
-        assertThat(promotionResult.buy()).isEqualTo(6);
-        assertThat(promotionResult.get()).isEqualTo(3);
-        assertThat(promotionResult.remain()).isEqualTo(1);
+        assertThat(promotionResult.getPromotionPriceQuantity()).isEqualTo(6);
+        assertThat(promotionResult.getBonusQuantity()).isEqualTo(3);
+        assertThat(promotionResult.getPendingQuantity()).isEqualTo(1);
     }
 
     // TODO: 테스트 구현하기.

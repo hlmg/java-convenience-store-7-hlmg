@@ -1,6 +1,7 @@
 package store.model.promotion;
 
 import java.time.LocalDate;
+import store.model.order.PromotionState;
 
 public class Promotion {
 
@@ -22,15 +23,36 @@ public class Promotion {
         return date.isBefore(startDate) || date.isAfter(endDate);
     }
 
-    public PromotionResult apply(int quantity) {
+    public PromotionResult apply(int stock, int orderQuantity) {
+        int promotionApplyQuantity = Math.min(stock, orderQuantity);
         int unit = buy + get;
-        int promotionCount = quantity / unit;
-        int remain = quantity % unit;
-        return new PromotionResult(buy * promotionCount, get * promotionCount, remain);
+        int promotionCount = promotionApplyQuantity / unit;
+        int remain = promotionApplyQuantity % unit;
+        if (stock < orderQuantity) {
+            remain += orderQuantity - stock;
+        }
+        PromotionState promotionState = getPromotionState(stock, orderQuantity, remain);
+        return new PromotionResult(buy * promotionCount, get * promotionCount, remain, promotionState);
     }
 
-    public boolean isBonusApplicable(int quantity) {
-        return buy == quantity;
+    private PromotionState getPromotionState(int stock, int orderQuantity, int remain) {
+        if (stock < orderQuantity) {
+            return PromotionState.PARTIALLY_PROMOTED;
+        }
+        if (stock == orderQuantity && remain == get) {
+            return PromotionState.PARTIALLY_PROMOTED;
+        }
+        return getPromotionState(remain);
+    }
+
+    private PromotionState getPromotionState(int remain) {
+        if (remain == 0) {
+            return PromotionState.FULL_PROMOTED;
+        }
+        if (remain == buy) {
+            return PromotionState.BONUS_ADDABLE;
+        }
+        return PromotionState.PARTIALLY_PROMOTED;
     }
 
     public String getName() {

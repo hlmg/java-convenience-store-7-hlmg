@@ -1,8 +1,8 @@
 package store.model.order;
 
-public enum BuyState {
+public enum PromotionState {
 
-    COMPLETE,
+    FULL_PROMOTED,
     PARTIALLY_PROMOTED,
     BONUS_ADDABLE,
 

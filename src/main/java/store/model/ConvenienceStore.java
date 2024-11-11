@@ -61,40 +61,13 @@ public class ConvenienceStore {
 
     private BuyResult proceedPromotionOrder(SellingProduct sellingProduct, OrderProduct orderProduct,
                                             Promotion promotion) {
-        if (sellingProduct.ifPromotionStockLessThanOrEquals(orderProduct.quantity())) {
-            return proceedLowStockPromotion(sellingProduct, orderProduct, promotion);
-        }
-        return proceedFullStockPromotion(sellingProduct, orderProduct, promotion);
-    }
-
-    private BuyResult proceedLowStockPromotion(SellingProduct sellingProduct, OrderProduct orderProduct,
-                                               Promotion promotion) {
         int promotionStock = sellingProduct.getPromotionStock();
-        PromotionResult promotionResult = promotion.apply(promotionStock);
-
-        int pendingQuantity = (orderProduct.quantity() - promotionStock) + promotionResult.remain();
-        int price = sellingProduct.getPrice();
-        return BuyResult.createPartiallyPromotedResult(orderProduct.name(), price, promotionResult.buy(),
-                promotionResult.get(),
-                pendingQuantity);
-    }
-
-    private BuyResult proceedFullStockPromotion(SellingProduct sellingProduct, OrderProduct orderProduct,
-                                                Promotion promotion) {
-        PromotionResult promotionResult = promotion.apply(orderProduct.quantity());
-        int pendingQuantity = promotionResult.remain();
-        int price = sellingProduct.getPrice();
-        if (promotion.isBonusApplicable(promotionResult.remain())) {
-            return BuyResult.createBonusAddableResult(orderProduct.name(), price, promotionResult.buy(),
-                    promotionResult.get(), pendingQuantity);
-        }
-        return BuyResult.createPartiallyPromotedResult(orderProduct.name(), price, promotionResult.buy(),
-                promotionResult.get(), pendingQuantity);
+        PromotionResult promotionResult = promotion.apply(promotionStock, orderProduct.quantity());
+        return BuyResult.createPromotionResult(sellingProduct.getSnapShot(), promotionResult);
     }
 
     private BuyResult proceedRegularOrder(SellingProduct sellingProduct, OrderProduct orderProduct) {
-        int price = sellingProduct.getPrice();
-        return BuyResult.createRegularCompleteResult(orderProduct.name(), price, orderProduct.quantity());
+        return BuyResult.createRegularOrder(sellingProduct.getSnapShot(), orderProduct.quantity());
     }
 
 }

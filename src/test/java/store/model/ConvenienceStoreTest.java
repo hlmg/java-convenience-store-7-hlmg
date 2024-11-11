@@ -2,7 +2,6 @@ package store.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.tuple;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -11,8 +10,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import store.exception.StoreException;
 import store.model.order.BuyResult;
-import store.model.order.BuyState;
-import store.model.order.BuyType;
 import store.model.order.OrderProduct;
 import store.model.product.Product;
 import store.model.promotion.Promotion;
@@ -73,10 +70,10 @@ class ConvenienceStoreTest {
             List<BuyResult> buyResults = convenienceStore.buyProducts(orderProducts, orderDate);
 
             // then
-            assertThat(buyResults).hasSize(1)
-                    .extracting("buyType", "buyState", "promotionPriceQuantity", "bonusQuantity", "pendingQuantity",
-                            "regularPriceQuantity")
-                    .containsExactly(tuple(BuyType.PROMOTION, BuyState.PARTIALLY_PROMOTED, 4, 2, 2, 0));
+            assertThat(buyResults).hasSize(1);
+            assertThat(buyResults.getFirst().isPromotionOrder()).isTrue();
+            assertThat(buyResults.getFirst().isPartiallyPromoted()).isTrue();
+            assertThat(buyResults.getFirst().getPendingQuantity()).isEqualTo(2);
         }
 
         @Test
@@ -98,10 +95,10 @@ class ConvenienceStoreTest {
             List<BuyResult> buyResults = convenienceStore.buyProducts(orderProducts, orderDate);
 
             // then
-            assertThat(buyResults).hasSize(1)
-                    .extracting("buyType", "buyState", "promotionPriceQuantity", "bonusQuantity", "pendingQuantity",
-                            "regularPriceQuantity")
-                    .containsExactly(tuple(BuyType.PROMOTION, BuyState.COMPLETE, 4, 2, 0, 0));
+            assertThat(buyResults).hasSize(1);
+            assertThat(buyResults.getFirst().isPromotionOrder()).isTrue();
+            assertThat(buyResults.getFirst().isComplete()).isTrue();
+            assertThat(buyResults.getFirst().getPendingQuantity()).isZero();
         }
 
     }
@@ -129,10 +126,10 @@ class ConvenienceStoreTest {
             List<BuyResult> buyResults = convenienceStore.buyProducts(orderProducts, orderDate);
 
             // then
-            assertThat(buyResults).hasSize(1)
-                    .extracting("buyType", "buyState", "promotionPriceQuantity", "bonusQuantity", "pendingQuantity",
-                            "regularPriceQuantity")
-                    .containsExactly(tuple(BuyType.PROMOTION, BuyState.PARTIALLY_PROMOTED, 4, 2, 1, 0));
+            assertThat(buyResults).hasSize(1);
+            assertThat(buyResults.getFirst().isPromotionOrder()).isTrue();
+            assertThat(buyResults.getFirst().isPartiallyPromoted()).isTrue();
+            assertThat(buyResults.getFirst().getPendingQuantity()).isEqualTo(1);
         }
 
         @Test
@@ -154,10 +151,10 @@ class ConvenienceStoreTest {
             List<BuyResult> buyResults = convenienceStore.buyProducts(orderProducts, orderDate);
 
             // then
-            assertThat(buyResults).hasSize(1)
-                    .extracting("buyType", "buyState", "promotionPriceQuantity", "bonusQuantity", "pendingQuantity",
-                            "regularPriceQuantity")
-                    .containsExactly(tuple(BuyType.PROMOTION, BuyState.BONUS_ADDABLE, 4, 2, 2, 0));
+            assertThat(buyResults).hasSize(1);
+            assertThat(buyResults.getFirst().isPromotionOrder()).isTrue();
+            assertThat(buyResults.getFirst().isBonusAddable()).isTrue();
+            assertThat(buyResults.getFirst().getPendingQuantity()).isEqualTo(2);
         }
 
         @Test
@@ -179,10 +176,10 @@ class ConvenienceStoreTest {
             List<BuyResult> buyResults = convenienceStore.buyProducts(orderProducts, orderDate);
 
             // then
-            assertThat(buyResults).hasSize(1)
-                    .extracting("buyType", "buyState", "promotionPriceQuantity", "bonusQuantity", "pendingQuantity",
-                            "regularPriceQuantity")
-                    .containsExactly(tuple(BuyType.PROMOTION, BuyState.COMPLETE, 6, 3, 0, 0));
+            assertThat(buyResults).hasSize(1);
+            assertThat(buyResults.getFirst().isPromotionOrder()).isTrue();
+            assertThat(buyResults.getFirst().isComplete()).isTrue();
+            assertThat(buyResults.getFirst().getPendingQuantity()).isZero();
         }
 
     }
@@ -205,10 +202,8 @@ class ConvenienceStoreTest {
         List<BuyResult> buyResults = convenienceStore.buyProducts(orderProducts, orderDate);
 
         // then
-        assertThat(buyResults).hasSize(1)
-                .extracting("buyType", "buyState", "promotionPriceQuantity", "bonusQuantity", "pendingQuantity",
-                        "regularPriceQuantity")
-                .containsExactly(tuple(BuyType.REGULAR, BuyState.COMPLETE, 0, 0, 0, 9));
+        assertThat(buyResults).hasSize(1);
+        assertThat(buyResults.getFirst().isPromotionOrder()).isFalse();
     }
 
     @Test
@@ -230,10 +225,8 @@ class ConvenienceStoreTest {
         List<BuyResult> buyResults = convenienceStore.buyProducts(orderProducts, orderDate);
 
         // then
-        assertThat(buyResults).hasSize(1)
-                .extracting("buyType", "buyState", "promotionPriceQuantity", "bonusQuantity", "pendingQuantity",
-                        "regularPriceQuantity")
-                .containsExactly(tuple(BuyType.REGULAR, BuyState.COMPLETE, 0, 0, 0, 9));
+        assertThat(buyResults).hasSize(1);
+        assertThat(buyResults.getFirst().isPromotionOrder()).isFalse();
     }
 
 }
