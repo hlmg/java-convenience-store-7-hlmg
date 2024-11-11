@@ -54,7 +54,7 @@ public class ConvenienceStore {
 
     public void deductProductsStock(List<BuyResult> buyResults) {
         for (BuyResult buyResult : buyResults) {
-            SellingProduct sellingProduct = sellingProducts.getProductBy(buyResult.productName());
+            SellingProduct sellingProduct = sellingProducts.getProductBy(buyResult.getProductName());
             sellingProduct.deductStock(buyResult.getTotalBuyQuantity(), buyResult.getBuyType());
         }
     }

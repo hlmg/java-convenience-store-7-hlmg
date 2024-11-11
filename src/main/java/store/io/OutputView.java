@@ -35,7 +35,7 @@ public class OutputView {
     private void printBuyProducts(List<BuyResult> buyResults) {
         println(String.format("%-19s%-10s%-6s", "상품명", "수량", "금액"));
         for (BuyResult buyResult : buyResults) {
-            String productName = buyResult.productName();
+            String productName = buyResult.getProductName();
             int buyQuantity = buyResult.getTotalBuyQuantity();
             String buyPrice = String.format("%,d", buyResult.getTotalBuyPrice());
             String message = String.format("%-19s%-10s%-6s", productName, buyQuantity, buyPrice);
@@ -47,8 +47,8 @@ public class OutputView {
         println("=============증     정===============");
         for (BuyResult buyResult : buyResults) {
             if (buyResult.hasBonus()) {
-                String productName = buyResult.productName();
-                int bonusQuantity = buyResult.bonusQuantity();
+                String productName = buyResult.getProductName();
+                int bonusQuantity = buyResult.getBonusQuantity();
                 String message = String.format("%-19s%-16s", productName, bonusQuantity);
                 println(message);
             }

@@ -101,32 +101,28 @@ public final class BuyResult {
         return promotionPriceQuantity + bonusQuantity + regularPriceQuantity;
     }
 
-    public String productName() {
-        return productName;
-    }
-
-    public BuyState buyState() {
-        return buyState;
-    }
-
-    public int promotionPriceQuantity() {
-        return promotionPriceQuantity;
-    }
-
-    public int bonusQuantity() {
-        return bonusQuantity;
-    }
-
     public int getPendingQuantity() {
         return pendingQuantity;
     }
 
-    public int getRegularPriceQuantity() {
-        return regularPriceQuantity;
+    public boolean isBonusAddable() {
+        return buyState == BuyState.BONUS_ADDABLE;
+    }
+
+    public boolean isComplete() {
+        return buyState == BuyState.COMPLETE;
+    }
+
+    public String getProductName() {
+        return productName;
     }
 
     public BuyType getBuyType() {
         return buyType;
+    }
+
+    public int getBonusQuantity() {
+        return bonusQuantity;
     }
 
 }

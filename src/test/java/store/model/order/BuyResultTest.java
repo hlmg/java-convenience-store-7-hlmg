@@ -1,7 +1,6 @@
 package store.model.order;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,11 +28,9 @@ class BuyResultTest {
         buyResult.resolvePendingState(userInputCommand);
 
         // then
-        assertThat(buyResult.buyState()).isSameAs(buyState);
-        assertThat(buyResult.promotionPriceQuantity()).isSameAs(promotionPriceQuantity);
-        assertThat(buyResult.bonusQuantity()).isSameAs(bonusQuantity);
-        assertThat(buyResult.getPendingQuantity()).isSameAs(pendingQuantity);
-        assertThat(buyResult.getRegularPriceQuantity()).isSameAs(regularPriceQuantity);
+        assertThat(buyResult).extracting("buyState", "promotionPriceQuantity", "bonusQuantity", "pendingQuantity",
+                        "regularPriceQuantity")
+                .contains(buyState, promotionPriceQuantity, bonusQuantity, pendingQuantity, regularPriceQuantity);
     }
 
     @CsvSource(textBlock = """
@@ -51,11 +48,9 @@ class BuyResultTest {
         buyResult.resolvePendingState(userInputCommand);
 
         // then
-        assertThat(buyResult.buyState()).isSameAs(buyState);
-        assertThat(buyResult.promotionPriceQuantity()).isSameAs(promotionPriceQuantity);
-        assertThat(buyResult.bonusQuantity()).isSameAs(bonusQuantity);
-        assertThat(buyResult.getPendingQuantity()).isSameAs(pendingQuantity);
-        assertThat(buyResult.getRegularPriceQuantity()).isSameAs(regularPriceQuantity);
+        assertThat(buyResult).extracting("buyState", "promotionPriceQuantity", "bonusQuantity", "pendingQuantity",
+                        "regularPriceQuantity")
+                .contains(buyState, promotionPriceQuantity, bonusQuantity, pendingQuantity, regularPriceQuantity);
     }
 
     @Test

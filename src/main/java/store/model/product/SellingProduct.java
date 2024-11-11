@@ -72,6 +72,10 @@ public class SellingProduct {
         deductRegularStockFirst(totalBuyQuantity);
     }
 
+    public boolean hasPromotion() {
+        return this.promotion != null;
+    }
+
     private void deductRegularStockFirst(int totalBuyQuantity) {
         if (regularStock >= totalBuyQuantity) {
             regularStock -= totalBuyQuantity;
@@ -90,10 +94,6 @@ public class SellingProduct {
         int remain = totalBuyQuantity - promotionStock;
         promotionStock = 0;
         regularStock -= remain;
-    }
-
-    public boolean hasPromotion() {
-        return this.promotion != null;
     }
 
 }

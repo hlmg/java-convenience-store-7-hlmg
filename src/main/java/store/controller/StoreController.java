@@ -11,7 +11,6 @@ import store.io.InputView;
 import store.io.OutputView;
 import store.model.ConvenienceStore;
 import store.model.order.BuyResult;
-import store.model.order.BuyState;
 import store.model.order.OrderProduct;
 import store.model.order.Receipt;
 import store.model.product.Product;
@@ -64,7 +63,7 @@ public class StoreController {
 
     private void processPendingResults(List<BuyResult> buyResults) {
         for (BuyResult buyResult : buyResults) {
-            if (buyResult.buyState() == BuyState.COMPLETE) {
+            if (buyResult.isComplete()) {
                 continue;
             }
             UserInputCommand userInputCommand = handleRetryableException(

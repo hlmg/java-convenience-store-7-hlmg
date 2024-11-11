@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 import store.exception.StoreException;
 import store.io.util.converter.StringConverter;
 import store.model.order.BuyResult;
-import store.model.order.BuyState;
 import store.model.order.OrderProduct;
 import store.model.user.UserInputCommand;
 
@@ -23,10 +22,10 @@ public class InputView {
     }
 
     public UserInputCommand getUserInputCommand(BuyResult buyResult) {
-        if (buyResult.buyState() == BuyState.BONUS_ADDABLE) {
-            return askAddBonus(buyResult.productName());
+        if (buyResult.isBonusAddable()) {
+            return askAddBonus(buyResult.getProductName());
         }
-        return askRegularPricePayment(buyResult.productName(), buyResult.getPendingQuantity());
+        return askRegularPricePayment(buyResult.getProductName(), buyResult.getPendingQuantity());
     }
 
     public UserInputCommand askMembershipDiscount() {

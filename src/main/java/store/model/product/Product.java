@@ -4,7 +4,7 @@ public final class Product {
 
     private final String name;
     private final int price;
-    private int quantity;
+    private final int quantity;
     private final String promotion;
 
     public Product(String name, int price, int quantity, String promotion) {
