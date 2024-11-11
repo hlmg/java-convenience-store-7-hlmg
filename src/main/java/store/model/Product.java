@@ -10,4 +10,8 @@ public record Product(String name, int price, int quantity, String promotion) {
         return promotion != null;
     }
 
+    public int deductStock(int totalBuyQuantity) {
+        throw new UnsupportedOperationException();
+    }
+
 }

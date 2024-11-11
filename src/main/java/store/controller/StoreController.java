@@ -42,6 +42,7 @@ public class StoreController {
             UserInputCommand membershipDecision = inputView.askMembershipDiscount();
             receipt.updateMembershipDecision(membershipDecision);
             outputView.printReceipt(receipt);
+            convenienceStore.deductProductsStock(receipt.getBuyResults());
             UserInputCommand additionalPurchase = inputView.askAdditionalPurchase();
             if (additionalPurchase == UserInputCommand.NO) {
                 break;

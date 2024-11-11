@@ -30,6 +30,49 @@ public class ConvenienceStore {
         return Collections.unmodifiableList(products);
     }
 
+    public void deductProductsStock(List<BuyResult> buyResults) {
+        // TODO: 로직 개선하기
+        for (BuyResult buyResult : buyResults) {
+            String productName = buyResult.productName();
+            List<Product> products = findProductsByName(productName);
+            Optional<Product> promotionProduct = findPromotionProduct(products);
+            Optional<Product> regularProduct = findRegularProduct(products);
+            if (buyResult.buyType() == BuyType.PROMOTION) {
+                int buyQuantity = buyResult.getTotalBuyQuantity();
+                if (promotionProduct.isPresent()) {
+                    Product product = promotionProduct.get();
+                    buyQuantity = product.deductStock(buyQuantity);
+                }
+                if (regularProduct.isPresent()) {
+                    Product product = regularProduct.get();
+                    product.deductStock(buyQuantity);
+                }
+                continue;
+            }
+            int buyQuantity = buyResult.getTotalBuyQuantity();
+            if (regularProduct.isPresent()) {
+                Product product = regularProduct.get();
+                buyQuantity = product.deductStock(buyQuantity);
+            }
+            if (promotionProduct.isPresent()) {
+                Product product = promotionProduct.get();
+                product.deductStock(buyQuantity);
+            }
+        }
+    }
+
+    private Optional<Product> findPromotionProduct(List<Product> products) {
+        return products.stream()
+                .filter(Product::hasPromotion)
+                .findAny();
+    }
+
+    private Optional<Product> findRegularProduct(List<Product> products) {
+        return products.stream()
+                .filter(product -> !product.hasPromotion())
+                .findAny();
+    }
+
     private List<Product> findProductsByName(String name) {
         return products.stream()
                 .filter(product -> product.nameEquals(name))
