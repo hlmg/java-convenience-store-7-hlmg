@@ -27,19 +27,26 @@ public class StoreController {
 
     public void run() {
         init();
-        outputView.printGreetingComment();
-        outputView.printProducts(convenienceStore.getProducts());
-        List<OrderProduct> orderProducts = inputView.getOrderProductsFromUser();
-        LocalDate orderDate = DateTimes.now().toLocalDate();
-        // TODO: 상품을 구매하기 전에, 존재하지 않는 상품인지, 재고 수량을 초과했는지, 중복 상품이 존재하는지 확인해야 함.
-        List<BuyResult> buyResults = new ArrayList<>();
-        for (OrderProduct orderProduct : orderProducts) {
-            buyResults.add(purchase(orderProduct, orderDate));
+
+        while(true) {
+            outputView.printGreetingComment();
+            outputView.printProducts(convenienceStore.getProducts());
+            List<OrderProduct> orderProducts = inputView.getOrderProductsFromUser();
+            LocalDate orderDate = DateTimes.now().toLocalDate();
+            // TODO: 상품을 구매하기 전에, 존재하지 않는 상품인지, 재고 수량을 초과했는지, 중복 상품이 존재하는지 확인해야 함.
+            List<BuyResult> buyResults = new ArrayList<>();
+            for (OrderProduct orderProduct : orderProducts) {
+                buyResults.add(purchase(orderProduct, orderDate));
+            }
+            Receipt receipt = new Receipt(buyResults);
+            UserInputCommand membershipDecision = inputView.askMembershipDiscount();
+            receipt.updateMembershipDecision(membershipDecision);
+            outputView.printReceipt(receipt);
+            UserInputCommand additionalPurchase = inputView.askAdditionalPurchase();
+            if (additionalPurchase == UserInputCommand.NO) {
+                break;
+            }
         }
-        Receipt receipt = new Receipt(buyResults);
-        UserInputCommand membershipDecision = inputView.askMembershipDiscount();
-        receipt.updateMembershipDecision(membershipDecision);
-        outputView.printReceipt(receipt);
     }
 
     private void init() {
