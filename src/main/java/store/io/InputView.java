@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import store.exception.StoreException;
+import store.model.order.BuyResult;
+import store.model.order.BuyState;
 import store.model.order.OrderProduct;
 import store.model.user.UserInputCommand;
 
@@ -67,6 +69,13 @@ public class InputView {
         UserInputCommand userInputCommand = UserInputCommand.from(userInput);
         System.out.println();
         return userInputCommand;
+    }
+
+    public UserInputCommand getUserInputCommand(BuyResult buyResult) {
+        if (buyResult.buyState() == BuyState.BONUS_ADDABLE) {
+            return askAddBonus(buyResult.productName());
+        }
+        return askRegularPricePayment(buyResult.productName(), buyResult.getPendingQuantity());
     }
 
 }

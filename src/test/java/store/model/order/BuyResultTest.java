@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import store.model.user.UserInputCommand;
 
 @SuppressWarnings("NonAsciiCharacters")
@@ -27,39 +26,14 @@ class BuyResultTest {
         BuyResult buyResult = new BuyResult(PRODUCT_NAME, PRICE, BuyType.PROMOTION, BuyState.BONUS_ADDABLE, 4, 2, 2, 0);
 
         // when
-        BuyResult finalResult = buyResult.applyBonusDecision(userInputCommand);
+        buyResult.resolvePendingState(userInputCommand);
 
         // then
-        assertThat(finalResult.buyState()).isSameAs(buyState);
-        assertThat(finalResult.promotionPriceQuantity()).isSameAs(promotionPriceQuantity);
-        assertThat(finalResult.bonusQuantity()).isSameAs(bonusQuantity);
-        assertThat(finalResult.pendingQuantity()).isSameAs(pendingQuantity);
-        assertThat(finalResult.regularPriceQuantity()).isSameAs(regularPriceQuantity);
-    }
-
-    @Test
-    void 증정_상품을_추가_여부를_처리할_수_없는_타입이면_예외가_발생한다() {
-        // given
-        BuyResult buyResult = new BuyResult(PRODUCT_NAME, PRICE, BuyType.REGULAR, BuyState.BONUS_ADDABLE, 4, 2, 2, 0);
-        UserInputCommand userInputCommand = UserInputCommand.YES;
-
-        // when & then
-        assertThatThrownBy(() -> buyResult.applyBonusDecision(userInputCommand))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("증정 상품 추가 여부를 처리할 수 없는 타입입니다.");
-    }
-
-    @ValueSource(strings = {"COMPLETE", "PARTIALLY_PROMOTED"})
-    @ParameterizedTest
-    void 증정_상품을_추가_여부를_처리할_수_없는_상태면_예외가_발생한다(BuyState buyState) {
-        // given
-        BuyResult buyResult = new BuyResult(PRODUCT_NAME, PRICE, BuyType.PROMOTION, buyState, 4, 2, 2, 0);
-        UserInputCommand userInputCommand = UserInputCommand.YES;
-
-        // when & then
-        assertThatThrownBy(() -> buyResult.applyBonusDecision(userInputCommand))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("증정 상품 추가 여부를 처리할 수 없는 상태입니다.");
+        assertThat(buyResult.buyState()).isSameAs(buyState);
+        assertThat(buyResult.promotionPriceQuantity()).isSameAs(promotionPriceQuantity);
+        assertThat(buyResult.bonusQuantity()).isSameAs(bonusQuantity);
+        assertThat(buyResult.getPendingQuantity()).isSameAs(pendingQuantity);
+        assertThat(buyResult.getRegularPriceQuantity()).isSameAs(regularPriceQuantity);
     }
 
     @CsvSource(textBlock = """
@@ -74,40 +48,14 @@ class BuyResultTest {
                 2, 0);
 
         // when
-        BuyResult finalResult = buyResult.applyRegularPricePaymentDecision(userInputCommand);
+        buyResult.resolvePendingState(userInputCommand);
 
         // then
-        assertThat(finalResult.buyState()).isSameAs(buyState);
-        assertThat(finalResult.promotionPriceQuantity()).isSameAs(promotionPriceQuantity);
-        assertThat(finalResult.bonusQuantity()).isSameAs(bonusQuantity);
-        assertThat(finalResult.pendingQuantity()).isSameAs(pendingQuantity);
-        assertThat(finalResult.regularPriceQuantity()).isSameAs(regularPriceQuantity);
-    }
-
-    @Test
-    void 정가_결제_여부를_처리할_수_없는_타입이면_예외가_발생한다() {
-        // given
-        BuyResult buyResult = new BuyResult(PRODUCT_NAME, PRICE, BuyType.REGULAR, BuyState.PARTIALLY_PROMOTED, 4, 2, 2,
-                0);
-        UserInputCommand userInputCommand = UserInputCommand.YES;
-
-        // when & then
-        assertThatThrownBy(() -> buyResult.applyRegularPricePaymentDecision(userInputCommand))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("정가 결제 여부를 처리할 수 없는 타입입니다.");
-    }
-
-    @ValueSource(strings = {"COMPLETE", "BONUS_ADDABLE"})
-    @ParameterizedTest
-    void 정가_결제_여부를_처리할_수_없는_상태면_예외가_발생한다(BuyState buyState) {
-        // given
-        BuyResult buyResult = new BuyResult(PRODUCT_NAME, PRICE, BuyType.PROMOTION, buyState, 4, 2, 2, 0);
-        UserInputCommand userInputCommand = UserInputCommand.YES;
-
-        // when & then
-        assertThatThrownBy(() -> buyResult.applyRegularPricePaymentDecision(userInputCommand))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("정가 결제 여부를 처리할 수 없는 상태입니다.");
+        assertThat(buyResult.buyState()).isSameAs(buyState);
+        assertThat(buyResult.promotionPriceQuantity()).isSameAs(promotionPriceQuantity);
+        assertThat(buyResult.bonusQuantity()).isSameAs(bonusQuantity);
+        assertThat(buyResult.getPendingQuantity()).isSameAs(pendingQuantity);
+        assertThat(buyResult.getRegularPriceQuantity()).isSameAs(regularPriceQuantity);
     }
 
     @Test

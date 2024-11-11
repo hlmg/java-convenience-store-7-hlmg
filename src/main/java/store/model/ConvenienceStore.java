@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import store.exception.StoreException;
 import store.model.order.BuyResult;
-import store.model.order.BuyType;
 import store.model.order.OrderOrganizer;
 import store.model.order.OrderProduct;
 import store.model.product.Product;
@@ -55,9 +54,8 @@ public class ConvenienceStore {
 
     public void deductProductsStock(List<BuyResult> buyResults) {
         for (BuyResult buyResult : buyResults) {
-            String productName = buyResult.productName();
-            SellingProduct sellingProduct = sellingProducts.getProductBy(productName);
-            sellingProduct.deductStock(buyResult.getTotalBuyQuantity(), BuyType.PROMOTION);
+            SellingProduct sellingProduct = sellingProducts.getProductBy(buyResult.productName());
+            sellingProduct.deductStock(buyResult.getTotalBuyQuantity(), buyResult.getBuyType());
         }
     }
 

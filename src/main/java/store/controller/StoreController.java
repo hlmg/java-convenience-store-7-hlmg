@@ -33,12 +33,16 @@ public class StoreController {
             outputView.printGreetingComment();
             outputView.printSellingProducts(convenienceStore.getSellingProducts());
             List<BuyResult> buyResults = handleRetryableException(this::order);
-            handleBuyResults(buyResults);
+
+            resolvePendingResult(buyResults);
+
             Receipt receipt = new Receipt(buyResults);
+
             UserInputCommand membershipDecision = handleRetryableException(inputView::askMembershipDiscount);
             receipt.updateMembershipDecision(membershipDecision);
             outputView.printReceipt(receipt);
             convenienceStore.deductProductsStock(receipt.getBuyResults());
+
             UserInputCommand additionalPurchase = handleRetryableException(inputView::askAdditionalPurchase);
             if (additionalPurchase == UserInputCommand.NO) {
                 break;
@@ -58,19 +62,13 @@ public class StoreController {
         return convenienceStore.order(orderProducts, orderDate);
     }
 
-    private void handleBuyResults(List<BuyResult> buyResults) {
+    private void resolvePendingResult(List<BuyResult> buyResults) {
         for (BuyResult buyResult : buyResults) {
-            if (buyResult.buyState() == BuyState.BONUS_ADDABLE) {
-                UserInputCommand bonusAddDecision = handleRetryableException(
-                        () -> inputView.askAddBonus(buyResult.productName()));
-                buyResult.applyBonusDecision(bonusAddDecision);
+            if (buyResult.buyState() == BuyState.COMPLETE) {
                 continue;
             }
-            if (buyResult.buyState() == BuyState.PARTIALLY_PROMOTED) {
-                UserInputCommand regularPricePaymentDecision = handleRetryableException(
-                        () -> inputView.askRegularPricePayment(buyResult.productName(), buyResult.pendingQuantity()));
-                buyResult.applyRegularPricePaymentDecision(regularPricePaymentDecision);
-            }
+            UserInputCommand userInputCommand = handleRetryableException(() -> inputView.getUserInputCommand(buyResult));
+            buyResult.resolvePendingState(userInputCommand);
         }
     }
 
