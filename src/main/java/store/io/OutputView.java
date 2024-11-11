@@ -20,7 +20,7 @@ public class OutputView {
 
     private void printProduct(Product product) {
         String stockMessage = getStockMessage(product.getQuantity());
-        String productMessage = String.format("- %s %,d원 %s개", product.getName(), product.getPrice(), stockMessage);
+        String productMessage = String.format("- %s %,d원 %s", product.getName(), product.getPrice(), stockMessage);
         if (product.hasPromotion()) {
             productMessage += " " + product.getPromotion();
         }
@@ -90,7 +90,7 @@ public class OutputView {
         if (quantity == 0) {
             return "재고 없음";
         }
-        return String.valueOf(quantity);
+        return quantity + "개";
     }
 
     private void println(String message) {
