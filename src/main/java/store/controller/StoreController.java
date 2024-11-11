@@ -24,52 +24,58 @@ public class StoreController {
     private final PromotionFileReader promotionFileReader = new PromotionFileReader();
     private final OutputView outputView = new OutputView();
     private final InputView inputView = new InputView();
+    private OrderState orderState;
     private ConvenienceStore convenienceStore;
 
     public void run() {
-        init();
-
-        while (true) {
-            outputView.printGreetingComment();
-            outputView.printSellingProducts(convenienceStore.getSellingProducts());
-            List<BuyResult> buyResults = handleRetryableException(this::order);
-
-            resolvePendingResult(buyResults);
-
-            Receipt receipt = new Receipt(buyResults);
-
-            UserInputCommand membershipDecision = handleRetryableException(inputView::askMembershipDiscount);
-            receipt.updateMembershipDecision(membershipDecision);
-            outputView.printReceipt(receipt);
-            convenienceStore.deductProductsStock(receipt.getBuyResults());
-
-            UserInputCommand additionalPurchase = handleRetryableException(inputView::askAdditionalPurchase);
-            if (additionalPurchase == UserInputCommand.NO) {
-                break;
-            }
+        storeInitialize();
+        while (orderState.inProgress()) {
+            orderState = proceedOrder();
         }
     }
 
-    private void init() {
+    private void storeInitialize() {
         List<Product> products = productFileReader.getProducts();
         List<Promotion> promotions = promotionFileReader.getPromotions();
         convenienceStore = new ConvenienceStore(products, promotions);
+        orderState = OrderState.IN_PROGRESS;
     }
 
-    private List<BuyResult> order() {
+    private OrderState proceedOrder() {
+        showStoreInformation();
+        List<BuyResult> buyResults = handleRetryableException(this::buyProducts);
+        processPendingResults(buyResults);
+        Receipt receipt = getReceipt(buyResults);
+        outputView.printReceipt(receipt);
+        convenienceStore.deductProductsStock(receipt.getBuyResults());
+        return orderState.additionalOrder(handleRetryableException(inputView::askAdditionalPurchase));
+    }
+
+    private void showStoreInformation() {
+        outputView.printGreetingComment();
+        outputView.printSellingProducts(convenienceStore.getSellingProducts());
+    }
+
+    private List<BuyResult> buyProducts() {
         List<OrderProduct> orderProducts = inputView.getOrderProductsFromUser();
         LocalDate orderDate = DateTimes.now().toLocalDate();
-        return convenienceStore.order(orderProducts, orderDate);
+        return convenienceStore.buyProducts(orderProducts, orderDate);
     }
 
-    private void resolvePendingResult(List<BuyResult> buyResults) {
+    private void processPendingResults(List<BuyResult> buyResults) {
         for (BuyResult buyResult : buyResults) {
             if (buyResult.buyState() == BuyState.COMPLETE) {
                 continue;
             }
-            UserInputCommand userInputCommand = handleRetryableException(() -> inputView.getUserInputCommand(buyResult));
+            UserInputCommand userInputCommand = handleRetryableException(
+                    () -> inputView.getUserInputCommand(buyResult));
             buyResult.resolvePendingState(userInputCommand);
         }
+    }
+
+    private Receipt getReceipt(List<BuyResult> buyResults) {
+        UserInputCommand membershipDecision = handleRetryableException(inputView::askMembershipDiscount);
+        return new Receipt(buyResults, membershipDecision);
     }
 
     private <T> T handleRetryableException(Supplier<T> supplier) {

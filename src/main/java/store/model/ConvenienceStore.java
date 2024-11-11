@@ -30,7 +30,7 @@ public class ConvenienceStore {
         return sellingProducts.getProducts();
     }
 
-    public List<BuyResult> order(List<OrderProduct> orderProducts, LocalDate orderDate) {
+    public List<BuyResult> buyProducts(List<OrderProduct> orderProducts, LocalDate orderDate) {
         orderProducts = orderOrganizer.organizeOrderProducts(orderProducts);
         List<BuyResult> buyResults = new ArrayList<>();
         for (OrderProduct orderProduct : orderProducts) {

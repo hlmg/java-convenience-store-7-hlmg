@@ -30,7 +30,7 @@ class ConvenienceStoreTest {
         LocalDate orderDate = LocalDate.parse("2024-11-01");
 
         // when & then
-        assertThatThrownBy(() -> convenienceStore.order(orderProduct, orderDate))
+        assertThatThrownBy(() -> convenienceStore.buyProducts(orderProduct, orderDate))
                 .isInstanceOf(StoreException.class)
                 .hasMessage("존재하지 않는 상품입니다.");
     }
@@ -45,7 +45,7 @@ class ConvenienceStoreTest {
         LocalDate orderDate = LocalDate.parse("2024-11-01");
 
         // when & then
-        assertThatThrownBy(() -> convenienceStore.order(orderProduct, orderDate))
+        assertThatThrownBy(() -> convenienceStore.buyProducts(orderProduct, orderDate))
                 .isInstanceOf(StoreException.class)
                 .hasMessage("재고 수량을 초과하여 구매할 수 없습니다.");
     }
@@ -70,7 +70,7 @@ class ConvenienceStoreTest {
             LocalDate orderDate = LocalDate.parse("2024-11-01");
 
             // when
-            List<BuyResult> buyResults = convenienceStore.order(orderProducts, orderDate);
+            List<BuyResult> buyResults = convenienceStore.buyProducts(orderProducts, orderDate);
 
             // then
             assertThat(buyResults).hasSize(1)
@@ -95,7 +95,7 @@ class ConvenienceStoreTest {
             LocalDate orderDate = LocalDate.parse("2024-11-01");
 
             // when
-            List<BuyResult> buyResults = convenienceStore.order(orderProducts, orderDate);
+            List<BuyResult> buyResults = convenienceStore.buyProducts(orderProducts, orderDate);
 
             // then
             assertThat(buyResults).hasSize(1)
@@ -126,7 +126,7 @@ class ConvenienceStoreTest {
             LocalDate orderDate = LocalDate.parse("2024-11-01");
 
             // when
-            List<BuyResult> buyResults = convenienceStore.order(orderProducts, orderDate);
+            List<BuyResult> buyResults = convenienceStore.buyProducts(orderProducts, orderDate);
 
             // then
             assertThat(buyResults).hasSize(1)
@@ -151,7 +151,7 @@ class ConvenienceStoreTest {
             LocalDate orderDate = LocalDate.parse("2024-11-01");
 
             // when
-            List<BuyResult> buyResults = convenienceStore.order(orderProducts, orderDate);
+            List<BuyResult> buyResults = convenienceStore.buyProducts(orderProducts, orderDate);
 
             // then
             assertThat(buyResults).hasSize(1)
@@ -176,7 +176,7 @@ class ConvenienceStoreTest {
             LocalDate orderDate = LocalDate.parse("2024-11-01");
 
             // when
-            List<BuyResult> buyResults = convenienceStore.order(orderProducts, orderDate);
+            List<BuyResult> buyResults = convenienceStore.buyProducts(orderProducts, orderDate);
 
             // then
             assertThat(buyResults).hasSize(1)
@@ -202,7 +202,7 @@ class ConvenienceStoreTest {
         LocalDate orderDate = LocalDate.parse("2024-11-01");
 
         // when
-        List<BuyResult> buyResults = convenienceStore.order(orderProducts, orderDate);
+        List<BuyResult> buyResults = convenienceStore.buyProducts(orderProducts, orderDate);
 
         // then
         assertThat(buyResults).hasSize(1)
@@ -227,7 +227,7 @@ class ConvenienceStoreTest {
         LocalDate orderDate = LocalDate.parse("2024-12-01");
 
         // when
-        List<BuyResult> buyResults = convenienceStore.order(orderProducts, orderDate);
+        List<BuyResult> buyResults = convenienceStore.buyProducts(orderProducts, orderDate);
 
         // then
         assertThat(buyResults).hasSize(1)

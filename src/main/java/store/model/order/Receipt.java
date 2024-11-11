@@ -9,15 +9,11 @@ public class Receipt {
 
     private final MembershipDiscount membershipDiscount;
     private final List<BuyResult> buyResults;
-    private UserInputCommand membershipDecision;
+    private final UserInputCommand membershipDecision;
 
-    public Receipt(List<BuyResult> buyResults) {
+    public Receipt(List<BuyResult> buyResults, UserInputCommand membershipDecision) {
         this.membershipDiscount = new MembershipDiscount();
         this.buyResults = buyResults;
-        this.membershipDecision = UserInputCommand.NO;
-    }
-
-    public void updateMembershipDecision(UserInputCommand membershipDecision) {
         this.membershipDecision = membershipDecision;
     }
 

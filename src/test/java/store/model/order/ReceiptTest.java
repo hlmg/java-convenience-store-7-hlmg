@@ -20,7 +20,7 @@ class ReceiptTest {
                 new BuyResult("에너지바", 2000, BuyType.REGULAR, BuyState.COMPLETE,
                         0, 0, 0, 2)
         );
-        Receipt receipt = new Receipt(buyResults);
+        Receipt receipt = new Receipt(buyResults, UserInputCommand.NO);
 
         // when
         int totalBuyPrice = receipt.getTotalBuyPrice();
@@ -38,7 +38,7 @@ class ReceiptTest {
                 new BuyResult("에너지바", 2000, BuyType.REGULAR, BuyState.COMPLETE,
                         0, 0, 0, 2)
         );
-        Receipt receipt = new Receipt(buyResults);
+        Receipt receipt = new Receipt(buyResults, UserInputCommand.NO);
 
         // when
         int promotionDiscountPrice = receipt.getPromotionDiscountPrice();
@@ -60,8 +60,7 @@ class ReceiptTest {
                 new BuyResult("에너지바", 2000, BuyType.REGULAR, BuyState.COMPLETE,
                         0, 0, 0, 2)
         );
-        Receipt receipt = new Receipt(buyResults);
-        receipt.updateMembershipDecision(membershipDecision);
+        Receipt receipt = new Receipt(buyResults, membershipDecision);
 
         // when
         int membershipDiscountPrice = receipt.getMembershipDiscountPrice();
@@ -79,8 +78,7 @@ class ReceiptTest {
                 new BuyResult("에너지바", 2000, BuyType.REGULAR, BuyState.COMPLETE,
                         0, 0, 0, 2)
         );
-        Receipt receipt = new Receipt(buyResults);
-        receipt.updateMembershipDecision(UserInputCommand.YES);
+        Receipt receipt = new Receipt(buyResults, UserInputCommand.YES);
 
         // when
         int paymentPrice = receipt.getPaymentPrice();
