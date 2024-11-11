@@ -19,10 +19,10 @@ public class OutputView {
     }
 
     private void printProduct(Product product) {
-        String stockMessage = getStockMessage(product.quantity());
-        String productMessage = String.format("- %s %,d원 %s개", product.name(), product.price(), stockMessage);
+        String stockMessage = getStockMessage(product.getQuantity());
+        String productMessage = String.format("- %s %,d원 %s개", product.getName(), product.getPrice(), stockMessage);
         if (product.hasPromotion()) {
-            productMessage += " " + product.promotion();
+            productMessage += " " + product.getPromotion();
         }
         println(productMessage);
     }

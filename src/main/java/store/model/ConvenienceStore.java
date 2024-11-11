@@ -93,13 +93,13 @@ public class ConvenienceStore {
 
     private int getStock(List<Product> products) {
         return products.stream()
-                .mapToInt(Product::quantity)
+                .mapToInt(Product::getQuantity)
                 .sum();
     }
 
     private Optional<Promotion> getActivePromotion(List<Product> products, LocalDate orderDate) {
         return products.stream()
-                .map(Product::promotion)
+                .map(Product::getPromotion)
                 .map(this::findPromotionByName)
                 .flatMap(Optional::stream)
                 .filter(promotion -> promotion.isActiveOn(orderDate))
@@ -150,7 +150,7 @@ public class ConvenienceStore {
     private int getPromotionStock(List<Product> products) {
         return products.stream()
                 .filter(Product::hasPromotion)
-                .mapToInt(Product::quantity)
+                .mapToInt(Product::getQuantity)
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("프로모션 상품이 없습니다."));
     }
@@ -160,7 +160,7 @@ public class ConvenienceStore {
                 .filter(product -> product.nameEquals(name))
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
-        return findProduct.price();
+        return findProduct.getPrice();
     }
 
     private BuyResult proceedRegularOrder(OrderProduct orderProduct) {
