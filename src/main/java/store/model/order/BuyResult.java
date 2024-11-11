@@ -45,23 +45,6 @@ public final class BuyResult {
         }
     }
 
-    private void applyBonusDecision(UserInputCommand bonusDecision) {
-        if (bonusDecision == UserInputCommand.YES) {
-            promotionResult.addBonus();
-        }
-        if (bonusDecision == UserInputCommand.NO) {
-            regularPriceQuantity = promotionResult.getPendingQuantity();
-        }
-        promotionResult.changeToFullPromotedState();
-    }
-
-    private void applyRegularPricePaymentDecision(UserInputCommand regularPricePaymentDecision) {
-        if (regularPricePaymentDecision == UserInputCommand.YES) {
-            regularPriceQuantity = promotionResult.getPendingQuantity();;
-        }
-        promotionResult.changeToFullPromotedState();
-    }
-
     public boolean hasBonus() {
         if (!isPromotionOrder()) {
             return false;
@@ -111,16 +94,25 @@ public final class BuyResult {
         return sellingProduct.name();
     }
 
-    // TODO: BuyType 제거하기
-    public BuyType getBuyType() {
-        if (isPromotionOrder()) {
-            return BuyType.PROMOTION;
-        }
-        return BuyType.REGULAR;
-    }
-
     public int getBonusQuantity() {
         return promotionResult.getBonusQuantity();
+    }
+
+    private void applyBonusDecision(UserInputCommand bonusDecision) {
+        if (bonusDecision == UserInputCommand.YES) {
+            promotionResult.addBonus();
+        }
+        if (bonusDecision == UserInputCommand.NO) {
+            regularPriceQuantity = promotionResult.getPendingQuantity();
+        }
+        promotionResult.changeToFullPromotedState();
+    }
+
+    private void applyRegularPricePaymentDecision(UserInputCommand regularPricePaymentDecision) {
+        if (regularPricePaymentDecision == UserInputCommand.YES) {
+            regularPriceQuantity = promotionResult.getPendingQuantity();;
+        }
+        promotionResult.changeToFullPromotedState();
     }
 
 }

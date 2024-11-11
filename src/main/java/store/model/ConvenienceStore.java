@@ -40,12 +40,20 @@ public class ConvenienceStore {
         return buyResults;
     }
 
+    public void deductProductsStock(List<BuyResult> buyResults) {
+        for (BuyResult buyResult : buyResults) {
+            SellingProduct sellingProduct = sellingProducts.getProductBy(buyResult.getProductName());
+            if (buyResult.isPromotionOrder()) {
+                sellingProduct.deductPromotionStockFirst(buyResult.getTotalBuyQuantity());
+                return;
+            }
+            sellingProduct.deductRegularStockFirst(buyResult.getTotalBuyQuantity());
+        }
+    }
+
     private BuyResult buy(OrderProduct orderProduct, LocalDate orderDate) {
         SellingProduct sellingProduct = sellingProducts.getProductBy(orderProduct.name());
-        int stock = sellingProduct.getStock();
-        if (stock < orderProduct.quantity()) {
-            throw new StoreException("재고 수량을 초과하여 구매할 수 없습니다.");
-        }
+        checkEnoughStock(sellingProduct, orderProduct.quantity());
         Optional<Promotion> promotion = promotions.findActivePromotion(sellingProduct.getPromotion(), orderDate);
         if (promotion.isPresent()) {
             return proceedPromotionOrder(sellingProduct, orderProduct, promotion.get());
@@ -53,10 +61,9 @@ public class ConvenienceStore {
         return proceedRegularOrder(sellingProduct, orderProduct);
     }
 
-    public void deductProductsStock(List<BuyResult> buyResults) {
-        for (BuyResult buyResult : buyResults) {
-            SellingProduct sellingProduct = sellingProducts.getProductBy(buyResult.getProductName());
-            sellingProduct.deductStock(buyResult.getTotalBuyQuantity(), buyResult.getBuyType());
+    private void checkEnoughStock(SellingProduct sellingProduct, int quantity) {
+        if (sellingProduct.isStockLessThan(quantity)) {
+            throw new StoreException("재고 수량을 초과하여 구매할 수 없습니다.");
         }
     }
 

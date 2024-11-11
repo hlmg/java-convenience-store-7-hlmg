@@ -24,7 +24,6 @@ public final class PromotionResult {
         return bonusQuantity;
     }
 
-
     public void addBonus() {
         promotionPriceQuantity += pendingQuantity;
         bonusQuantity++;

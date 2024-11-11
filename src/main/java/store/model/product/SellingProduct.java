@@ -1,7 +1,5 @@
 package store.model.product;
 
-import store.model.order.BuyType;
-
 public class SellingProduct {
 
     private final String name;
@@ -36,43 +34,7 @@ public class SellingProduct {
         this.regularStock = product.getQuantity();
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public int getStock() {
-        return regularStock + promotionStock;
-    }
-
-    public String getPromotion() {
-        return promotion;
-    }
-
-    public int getPromotionStock() {
-        return promotionStock;
-    }
-
-    public int getRegularStock() {
-        return regularStock;
-    }
-
-    public int getPrice() {
-        return price;
-    }
-
-    public void deductStock(int totalBuyQuantity, BuyType buyType) {
-        if (buyType == BuyType.PROMOTION) {
-            deductPromotionStockFirst(totalBuyQuantity);
-            return;
-        }
-        deductRegularStockFirst(totalBuyQuantity);
-    }
-
-    public boolean hasPromotion() {
-        return this.promotion != null;
-    }
-
-    private void deductRegularStockFirst(int totalBuyQuantity) {
+    public void deductRegularStockFirst(int totalBuyQuantity) {
         if (regularStock >= totalBuyQuantity) {
             regularStock -= totalBuyQuantity;
             return;
@@ -82,7 +44,7 @@ public class SellingProduct {
         promotionStock -= remain;
     }
 
-    private void deductPromotionStockFirst(int totalBuyQuantity) {
+    public void deductPromotionStockFirst(int totalBuyQuantity) {
         if (promotionStock >= totalBuyQuantity) {
             promotionStock -= totalBuyQuantity;
             return;
@@ -92,8 +54,24 @@ public class SellingProduct {
         regularStock -= remain;
     }
 
+    public int getPromotionStock() {
+        return promotionStock;
+    }
+
+    public String getPromotion() {
+        return promotion;
+    }
+
     public SellingProductSnapshot getSnapShot() {
         return new SellingProductSnapshot(name, price, regularStock, promotionStock, promotion);
+    }
+
+    public boolean isStockLessThan(int quantity) {
+        return calculateTotalStock() < quantity;
+    }
+
+    private int calculateTotalStock() {
+        return regularStock + promotionStock;
     }
 
 }
